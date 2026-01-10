@@ -39,7 +39,7 @@ export default function Hero() {
                 >
                     <div className="relative w-full h-full">
                         <Image
-                            src="/images/roomi_gate_graphic.png"
+                            src="/images/roomi_gate_symmetric.png"
                             alt="Roomi Left"
                             fill
                             className="object-contain object-left-bottom"
@@ -57,7 +57,7 @@ export default function Hero() {
                 >
                     <div className="relative w-full h-full">
                         <Image
-                            src="/images/roomi_gate_graphic.png"
+                            src="/images/roomi_gate_symmetric.png"
                             alt="Roomi Right"
                             fill
                             className="object-contain object-right-bottom"

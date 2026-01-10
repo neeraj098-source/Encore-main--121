@@ -39,7 +39,7 @@ export default function Loader() {
                         {/* The Roomi Gate Image */}
                         <div className="relative w-full h-full max-w-4xl max-h-[80vh] aspect-square">
                             <Image
-                                src="/images/roomi_zoom.png"
+                                src="/images/roomi_gate_symmetric.png"
                                 alt="Enter Encore"
                                 fill
                                 className="object-contain"

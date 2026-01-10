@@ -66,7 +66,7 @@ export default function Navbar() {
                         <Link href="/">
                             <div className="relative h-12 w-12 md:h-16 md:w-16 rounded-full overflow-hidden border border-white/20">
                                 <Image
-                                    src="/images/iet_logo.png"
+                                    src="/images/iet_logo_new.png"
                                     alt="IET Logo"
                                     fill
                                     className="object-cover"
@@ -101,10 +101,10 @@ export default function Navbar() {
                                 <Button variant="primary" size="sm">Login</Button>
                             </Link>
                         )}
-                        <div className="relative h-12 w-12 md:h-16 md:w-16">
+                        <div className="relative h-12 w-32 md:h-16 md:w-48">
                             <Image
-                                src="/images/issacc_logo.png"
-                                alt="ISSACC Logo"
+                                src="/images/issacc_new.png"
+                                alt="ISSACC Arts & Cultural"
                                 fill
                                 className="object-contain"
                             />

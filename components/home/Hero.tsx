@@ -31,19 +31,6 @@ export default function Hero() {
             {/* Content High Z-Index */}
             <div className="relative z-20 text-center px-4 max-w-5xl mx-auto">
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.8 }}
-                    className="relative w-24 h-24 md:w-32 md:h-32 mx-auto mb-6 opacity-90"
-                >
-                    <Image
-                        src="/images/iet_logo_new.png"
-                        alt="IET Logo"
-                        fill
-                        className="object-contain drop-shadow-[0_0_15px_rgba(255,215,0,0.3)]"
-                    />
-                </motion.div>
-                <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.2 }}

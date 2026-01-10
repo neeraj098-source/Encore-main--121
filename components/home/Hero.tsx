@@ -21,7 +21,7 @@ export default function Hero() {
                     loop
                     muted
                     playsInline
-                    className="object-cover w-full h-full opacity-50"
+                    className="object-cover w-full h-full opacity-50 pointer-events-none"
                 >
                     <source src="/video/bg.mp4" type="video/mp4" />
                 </video>

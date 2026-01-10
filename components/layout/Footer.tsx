@@ -14,7 +14,7 @@ export default function Footer() {
                     <div className="space-y-6">
                         <div className="flex items-center gap-3">
                             <div className="relative w-12 h-12">
-                                <Image src="/images/iet_logo.png" alt="IET Logo" fill className="object-contain rounded-full" />
+                                <Image src="/images/iet_logo_new.png" alt="IET Logo" fill className="object-contain rounded-full" />
                             </div>
                             <span className="text-2xl font-cinzel text-gold font-bold">ENCORE</span>
                         </div>

@@ -49,7 +49,7 @@ export default function Loader() {
                         className="relative z-20 flex flex-col items-center"
                     >
                         <div className="relative w-32 h-32 mb-6">
-                            <Image src="/images/iet_logo.png" alt="Loader Logo" fill className="object-contain" />
+                            <Image src="/images/iet_logo_new.png" alt="Loader Logo" fill className="object-contain" />
                         </div>
                         <h1 className="text-4xl font-cinzel text-gold font-bold tracking-[0.2em] mb-2 text-center">ENCORE</h1>
                         <p className="text-gray-400 font-marcellus text-sm tracking-widest uppercase">Nawabi Elegance</p>

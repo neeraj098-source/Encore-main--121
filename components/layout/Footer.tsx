@@ -81,7 +81,7 @@ export default function Footer() {
                 {/* Bottom Bar */}
                 <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500 font-marcellus">
                     <p>© 2026 Encore IET Lucknow. All rights reserved.</p>
-                    <p>Designed & Developed with <span className="text-gold">♥</span> by Web Team</p>
+                    <p>Designed & Developed with <span className="text-gold">♥</span> by Hensi Baghel</p>
                 </div>
             </div>
         </footer>

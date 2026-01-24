@@ -74,7 +74,7 @@ export default function Hero() {
                 variants={leftGateVariant}
                 initial="hidden"
                 animate="visible"
-                className="absolute bottom-0 left-0 w-[40vw] h-[50vh] md:w-[35vw] md:h-[65vh] z-10 pointer-events-none"
+                className="absolute bottom-0 left-0 w-[60vw] h-[50vh] md:w-[35vw] md:h-[65vh] z-10 pointer-events-none"
             >
                 <div className="relative w-full h-full">
                     <Image
@@ -92,7 +92,7 @@ export default function Hero() {
                 variants={rightGateVariant}
                 initial="hidden"
                 animate="visible"
-                className="absolute bottom-0 right-0 w-[40vw] h-[50vh] md:w-[35vw] md:h-[65vh] z-10 pointer-events-none"
+                className="absolute bottom-0 right-0 w-[60vw] h-[50vh] md:w-[35vw] md:h-[65vh] z-10 pointer-events-none"
             >
                 <div className="relative w-full h-full">
                     <Image

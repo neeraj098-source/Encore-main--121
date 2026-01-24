@@ -8,8 +8,8 @@ import { User, Lock, Users, ArrowRight } from 'lucide-react';
 
 export default function CAPortal() {
     const router = useRouter();
-    const isLogin = true; // Always login mode
-    const [formData, setFormData] = useState({ name: '', email: '', college: '' });
+    const [isLogin, setIsLogin] = useState(false);
+    const [formData, setFormData] = useState({ name: '', email: '', phone: '', college: '' });
     const [loading, setLoading] = useState(false);
 
     const handleAction = async (e: React.FormEvent) => {
@@ -35,6 +35,10 @@ export default function CAPortal() {
                     return;
                 }
                 localStorage.setItem('encore_user', JSON.stringify(data.user));
+                // If registered, show success or redirect
+                if (!isLogin && data.code) {
+                    alert(`Registration Successful! Your Referral Code is: ${data.code}`);
+                }
                 router.push('/dashboard');
             } else {
                 const err = await res.json();
@@ -76,11 +80,47 @@ export default function CAPortal() {
                 </div>
 
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-cinzel text-gold mb-2">CA Login</h1>
-                    <p className="text-gray-400 font-marcellus text-sm">Access your Ambassador Dashboard</p>
+                    <h1 className="text-3xl font-cinzel text-gold mb-2">{isLogin ? 'CA Login' : 'CA Registration'}</h1>
+                    <p className="text-gray-400 font-marcellus text-sm">{isLogin ? 'Access your Ambassador Dashboard' : 'Join the Elite Envoys of Encore'}</p>
                 </div>
 
                 <form onSubmit={handleAction} className="space-y-4">
+                    {!isLogin && (
+                        <>
+                            <div className="space-y-2">
+                                <label className="text-sm font-marcellus text-gray-300">Full Name</label>
+                                <input
+                                    type="text"
+                                    required
+                                    className="w-full bg-black/40 border border-white/20 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-gold"
+                                    placeholder="Your Name"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-marcellus text-gray-300">College / Institute</label>
+                                <input
+                                    type="text"
+                                    required
+                                    className="w-full bg-black/40 border border-white/20 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-gold"
+                                    placeholder="Institute Name"
+                                    value={formData.college}
+                                    onChange={(e) => setFormData({ ...formData, college: e.target.value })}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-marcellus text-gray-300">Phone Number</label>
+                                <input
+                                    type="tel"
+                                    className="w-full bg-black/40 border border-white/20 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-gold"
+                                    placeholder="+91 XXXXX XXXXX"
+                                    value={formData.phone}
+                                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                />
+                            </div>
+                        </>
+                    )}
                     <div className="space-y-2">
                         <label className="text-sm font-marcellus text-gray-300">Email (Official)</label>
                         <input
@@ -94,12 +134,12 @@ export default function CAPortal() {
                     </div>
 
                     <Button type="submit" className="w-full py-6 text-lg" disabled={loading}>
-                        {loading ? 'Verifying...' : 'Login'}
+                        {loading ? 'Processing...' : (isLogin ? 'Login' : 'Register as CA')}
                     </Button>
                 </form>
 
-                <p className="text-xs text-center text-gray-500 mt-6">
-                    Not a Campus Ambassador? <br /> Contact the Encore Team to apply.
+                <p className="text-xs text-center text-gray-500 mt-6 cursor-pointer hover:text-gold transition-colors" onClick={() => setIsLogin(!isLogin)}>
+                    {isLogin ? "Not a Campus Ambassador? Apply Now." : "Already have an account? Login."}
                 </p>
             </motion.div>
         </main>

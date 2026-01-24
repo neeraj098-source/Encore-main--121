@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import { Menu, X, ShoppingCart } from 'lucide-react';
+import CartDrawer from '@/components/cart/CartDrawer';
 
 export default function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -15,6 +16,7 @@ export default function Navbar() {
     const { scrollY } = useScroll();
 
     const [cartCount, setCartCount] = useState(0);
+    const [isCartOpen, setIsCartOpen] = useState(false);
 
     const updateCartCount = async () => {
         try {
@@ -64,6 +66,7 @@ export default function Navbar() {
     const navLinks = [
         { name: 'Home', href: '/' },
         { name: 'Events', href: '/events' },
+        { name: 'About', href: '/about' },
         { name: 'CA Portal', href: '/ca-portal' },
         { name: 'Sponsorship', href: '/sponsorship' },
     ];
@@ -80,7 +83,8 @@ export default function Navbar() {
             animate={{ y: 0 }}
             transition={{ duration: 0.5 }}
         >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-[22vw]">
+            <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
                 <div className="flex justify-between items-center h-20">
 
                     {/* Logo Left */}
@@ -97,8 +101,7 @@ export default function Navbar() {
                         </Link>
                     </div>
 
-                    {/* Desktop Links */}
-                    <div className="hidden md:flex items-center space-x-8">
+                    <div className="hidden md:flex items-center absolute left-1/2 transform -translate-x-1/2">
                         <div className="flex items-center space-x-6 bg-black/40 px-6 py-2 rounded-full border border-white/5 backdrop-blur-sm">
                             {navLinks.map((link) => (
                                 <Link
@@ -114,7 +117,7 @@ export default function Navbar() {
 
                     {/* Right/Login + Logo */}
                     <div className="hidden md:flex items-center space-x-6">
-                        <Link href="/cart" className="relative group">
+                        <button onClick={() => setIsCartOpen(true)} className="relative group">
                             <div className="p-2 text-white hover:text-gold transition-colors">
                                 <ShoppingCart size={24} />
                                 {cartCount > 0 && (
@@ -123,7 +126,7 @@ export default function Navbar() {
                                     </span>
                                 )}
                             </div>
-                        </Link>
+                        </button>
 
                         {isLoggedIn ? (
                             <Link href="/dashboard">
@@ -139,7 +142,7 @@ export default function Navbar() {
                                 src="/images/issacc_new.png"
                                 alt="ISSACC Arts & Cultural"
                                 fill
-                                className="object-contain"
+                                className="object-contain mix-blend-screen"
                             />
                         </div>
                     </div>

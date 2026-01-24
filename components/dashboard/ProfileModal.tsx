@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
+import Modal from '@/components/ui/Modal';
 import { X, Building, Phone, GraduationCap } from 'lucide-react';
 
 interface ProfileModalProps {
@@ -17,6 +18,18 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }: Profil
         college: user.college || '',
         year: user.year || '',
         phone: user.phone || ''
+    });
+
+    const [modalState, setModalState] = useState<{
+        isOpen: boolean;
+        title: string;
+        message: string;
+        type: "success" | "error" | "info" | "warning";
+    }>({
+        isOpen: false,
+        title: "",
+        message: "",
+        type: "info"
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -36,13 +49,14 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }: Profil
             if (res.ok) {
                 const data = await res.json();
                 onUpdate(data.user); // Update parent with new user data from server
-                alert(data.message);
-                onClose();
+                setModalState({ isOpen: true, title: "Success", message: data.message, type: "success" });
+                // We delay closing the main modal slightly so they see the success message
+                setTimeout(() => onClose(), 1500);
             } else {
-                alert("Update failed");
+                setModalState({ isOpen: true, title: "Update Failed", message: "Could not update profile. Please try again.", type: "error" });
             }
         } catch (error) {
-            alert("Network Error");
+            setModalState({ isOpen: true, title: "Network Error", message: "Please check your connection.", type: "error" });
         }
     };
 
@@ -50,12 +64,21 @@ export default function ProfileModal({ isOpen, onClose, user, onUpdate }: Profil
         <AnimatePresence>
             {isOpen && (
                 <>
+                    {/* Inner Modal for Success/Error */}
+                    <Modal
+                        isOpen={modalState.isOpen}
+                        onClose={() => setModalState(prev => ({ ...prev, isOpen: false }))}
+                        title={modalState.title}
+                        message={modalState.message}
+                        type={modalState.type}
+                    />
+
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50"
+                        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40"
                     />
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}

@@ -103,14 +103,14 @@ export default function EventDetailClient() {
                 </div>
 
                 {/* Right: Actions & Details Card */}
-                <div className="space-y-6">
+                <div className="space-y-6 md:-mt-32 relative z-10">
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.2 }}
                         className="bg-white/5 border border-white/10 rounded-2xl p-6 sticky top-24"
                     >
-                        <div className="aspect-video relative rounded-lg overflow-hidden mb-6 border border-white/20">
+                        <div className="aspect-[3/4] relative rounded-lg overflow-hidden mb-6 border border-white/20">
                             <Image src={event.image} alt={event.title} fill className="object-cover" />
                         </div>
 

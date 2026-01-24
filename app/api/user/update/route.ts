@@ -19,25 +19,18 @@ export async function POST(request: Request) {
 
         if (!currentUser) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-        let coinIncrement = 0;
-
-        // If completing profile for the first time
-        if (updates.profileCompleted && !currentUser.profileCompleted) {
-            coinIncrement = 50;
-        }
-
         const updatedUser = await prisma.user.update({
             where: { email },
             data: {
                 ...updates,
-                caCoins: { increment: coinIncrement }
+                // No coins awarded for profile completion anymore
             }
         });
 
         return NextResponse.json({
             success: true,
             user: updatedUser,
-            message: coinIncrement > 0 ? "Profile Updated! +50 Coins" : "Profile Updated"
+            message: "Profile Updated Successfully"
         }, { status: 200 });
 
     } catch (error) {

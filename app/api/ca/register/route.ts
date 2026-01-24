@@ -22,8 +22,8 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'User already exists' }, { status: 400 });
         }
 
-        // Generate Referral Code (First name + random 3 digits)
-        const code = `${name.split(' ')[0].toUpperCase()}${Math.floor(100 + Math.random() * 900)}`;
+        // Generate Referral Code (Random 5-digit number)
+        const code = Math.floor(10000 + Math.random() * 90000).toString();
 
         // Create CA User
         const newCA = await prisma.user.create({

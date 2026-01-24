@@ -24,8 +24,23 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
     }
 
+    const { passType, paymentId, paymentScreenshot } = await req.json().catch(() => ({ passType: null }));
+
     const cartItems = user.cart.items;
-    const totalAmount = cartItems.reduce((sum, item) => sum + item.price, 0);
+    let totalAmount = cartItems.reduce((sum, item) => sum + item.price, 0);
+
+    // Add Pass Price (Only if not already paid)
+    let passPrice = 0;
+    if (user.totalPaid === 0) {
+        if (passType === 'basic') passPrice = 399;
+        if (passType === 'accommodation') passPrice = 999;
+    }
+    totalAmount += passPrice;
+
+    // Validate Payment Proof for Paid Orders
+    if (totalAmount > 0 && (!paymentId || !paymentScreenshot)) {
+        return NextResponse.json({ error: "Payment proof missing" }, { status: 400 });
+    }
 
     // Create Order
     const order = await prisma.order.create({
@@ -33,6 +48,9 @@ export async function POST(req: NextRequest) {
             userId: user.id,
             totalAmount: totalAmount,
             status: "PENDING",
+            passType: passType,
+            paymentId: paymentId,
+            paymentScreenshot: paymentScreenshot,
             items: {
                 create: cartItems.map((item) => ({
                     eventSlug: item.eventSlug,

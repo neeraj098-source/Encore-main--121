@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Instagram, Facebook, Mail, Phone, MapPin } from 'lucide-react';
+import { Instagram, Facebook, Mail, Phone, MapPin, Twitter, Linkedin } from 'lucide-react';
 
 export default function Footer() {
     const pathname = usePathname();
@@ -28,11 +28,17 @@ export default function Footer() {
                             The Annual Cultural Fest of IET Lucknow. A celebration of art, culture, and nawabi elegance.
                         </p>
                         <div className="flex gap-4">
-                            <a href="https://www.instagram.com/encore.iet/" className="text-gray-400 hover:text-gold transition-colors">
+                            <a href="https://www.instagram.com/encore.iet/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gold transition-colors">
                                 <Instagram size={20} />
                             </a>
-                            <a href="#" className="text-gray-400 hover:text-gold transition-colors">
+                            <a href="https://facebook.com/iet_encore" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gold transition-colors">
                                 <Facebook size={20} />
+                            </a>
+                            <a href="https://x.com/iet_encore" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gold transition-colors">
+                                <Twitter size={20} />
+                            </a>
+                            <a href="https://linkedin.com/company/iet-encore" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gold transition-colors">
+                                <Linkedin size={20} />
                             </a>
                         </div>
                     </div>

@@ -43,6 +43,23 @@ export default function LoginForm() {
         accommodation: ''
     });
 
+    const handleDevFill = () => {
+        const randomStr = Math.random().toString(36).substring(7);
+        setFormData({
+            name: "Dev User",
+            email: `dev${randomStr}@example.com`,
+            phone: "9876543210",
+            gender: "Male",
+            referralCode: "",
+            password: "password123",
+            confirmPassword: "password123",
+            college: "IET Lucknow",
+            year: "2",
+            course: "B.Tech",
+            accommodation: "no"
+        });
+    };
+
     // Login Data
     const [loginData, setLoginData] = useState({
         email: '',
@@ -107,8 +124,9 @@ export default function LoginForm() {
                     type: "error"
                 });
             } else {
-                // Set localStorage for Dashboard compatibility
                 localStorage.setItem('encore_user', JSON.stringify({ email: loginData.email }));
+                // Notify Navbar immediately
+                window.dispatchEvent(new Event('user-login'));
                 router.push('/dashboard');
             }
         } catch (error) {
@@ -155,21 +173,12 @@ export default function LoginForm() {
                 });
                 return;
             }
-            setStep(3);
+            // Skip Payment -> Submit Directly
+            handleSubmit();
         }
     };
 
     const handleSubmit = async () => {
-        if (!paymentState.paymentId || !paymentState.preview) {
-            setModalState({
-                isOpen: true,
-                title: "Payment Required",
-                message: "Please provide Transaction ID and Screenshot to complete registration.",
-                type: "warning"
-            });
-            return;
-        }
-
         setIsLoading(true);
         try {
             const res = await fetch('/api/register', {
@@ -180,9 +189,9 @@ export default function LoginForm() {
                     email: formData.email.trim(),
                     password: formData.password.trim(),
                     confirmPassword: formData.confirmPassword.trim(),
-                    paymentId: paymentState.paymentId.trim(),
-                    paymentScreenshot: paymentState.preview,
-                    totalPaid: formData.accommodation === 'yes' ? 999 : 399
+                    // paymentId: paymentState.paymentId.trim(),
+                    // paymentScreenshot: paymentState.preview,
+                    totalPaid: 0 // Payment deferred
                 }),
             });
 
@@ -195,7 +204,10 @@ export default function LoginForm() {
                         title: "User Exists",
                         message: "User already exists! Please login.",
                         type: "info",
-                        onAction: () => setIsLoginMode(true),
+                        onAction: () => {
+                            setIsLoginMode(true);
+                            setModalState(prev => ({ ...prev, isOpen: false }));
+                        },
                         actionLabel: "Login Now"
                     });
                 } else {
@@ -204,10 +216,14 @@ export default function LoginForm() {
                         title: "Success",
                         message: "Registration Successful! Please login with your credentials.",
                         type: "success",
-                        onAction: () => setIsLoginMode(true), // Switch to login after registration
+                        onAction: () => {
+                            setIsLoginMode(true);
+                            setModalState(prev => ({ ...prev, isOpen: false }));
+                        }, // Switch to login after registration
                         actionLabel: "Login Now"
                     });
                     localStorage.setItem('encore_user', JSON.stringify(data.user));
+                    window.dispatchEvent(new Event('user-login'));
                 }
             } else {
                 setModalState({
@@ -262,12 +278,14 @@ export default function LoginForm() {
             <div className="relative z-10 flex justify-center mb-8">
                 <div className="bg-black/40 border border-white/10 p-1 rounded-xl flex">
                     <button
+                        type="button"
                         onClick={() => setIsLoginMode(true)}
                         className={`px-6 py-2 rounded-lg font-cinzel text-sm transition-all ${isLoginMode ? 'bg-gold text-black shadow-lg shadow-gold/20' : 'text-gray-400 hover:text-white'}`}
                     >
                         Login
                     </button>
                     <button
+                        type="button"
                         onClick={() => setIsLoginMode(false)}
                         className={`px-6 py-2 rounded-lg font-cinzel text-sm transition-all ${!isLoginMode ? 'bg-gold text-black shadow-lg shadow-gold/20' : 'text-gray-400 hover:text-white'}`}
                     >
@@ -284,44 +302,46 @@ export default function LoginForm() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="space-y-6 relative z-10"
                     >
-                        {/* Email */}
-                        <div className="space-y-2">
-                            <label className="text-sm font-marcellus text-gold/80 ml-1">Email ID</label>
-                            <div className="relative group">
-                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-gold transition-colors h-5 w-5" />
-                                <input
-                                    className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-white/20 focus:outline-none focus:border-gold/50 transition-all font-sans"
-                                    placeholder="Enter your email"
-                                    value={loginData.email}
-                                    onChange={(e) => handleLoginChange('email', e.target.value)}
-                                />
+                        <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }} className="space-y-6 relative z-10">
+                            {/* Email */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-marcellus text-gold/80 ml-1">Email ID</label>
+                                <div className="relative group">
+                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-gold transition-colors h-5 w-5" />
+                                    <input
+                                        className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-white/20 focus:outline-none focus:border-gold/50 transition-all font-sans"
+                                        placeholder="Enter your email"
+                                        value={loginData.email}
+                                        onChange={(e) => handleLoginChange('email', e.target.value)}
+                                    />
+                                </div>
                             </div>
-                        </div>
 
-                        {/* Password */}
-                        <div className="space-y-2">
-                            <label className="text-sm font-marcellus text-gold/80 ml-1">Password</label>
-                            <div className="relative group">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-gold transition-colors h-5 w-5" />
-                                <input
-                                    type="password"
-                                    className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-white/20 focus:outline-none focus:border-gold/50 transition-all font-sans"
-                                    placeholder="Enter your password"
-                                    value={loginData.password}
-                                    onChange={(e) => handleLoginChange('password', e.target.value)}
-                                />
+                            {/* Password */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-marcellus text-gold/80 ml-1">Password</label>
+                                <div className="relative group">
+                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-gold transition-colors h-5 w-5" />
+                                    <input
+                                        type="password"
+                                        className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-white/20 focus:outline-none focus:border-gold/50 transition-all font-sans"
+                                        placeholder="Enter your password"
+                                        value={loginData.password}
+                                        onChange={(e) => handleLoginChange('password', e.target.value)}
+                                    />
+                                </div>
                             </div>
-                        </div>
 
-                        <Button
-                            onClick={handleLogin}
-                            disabled={isLoading}
-                            className="w-full py-4 text-lg font-cinzel rounded-xl bg-gold text-black hover:bg-white hover:text-black transition-all shadow-lg shadow-gold/10 mt-4"
-                        >
-                            {isLoading ? "Signing In..." : "Sign In"}
-                        </Button>
+                            <Button
+                                type="submit"
+                                disabled={isLoading}
+                                className="w-full py-4 text-lg font-cinzel rounded-xl bg-gold text-black hover:bg-white hover:text-black transition-all shadow-lg shadow-gold/10 mt-4"
+                            >
+                                {isLoading ? "Signing In..." : "Sign In"}
+                            </Button>
+
+                        </form>
 
                     </motion.div>
                 ) : (
@@ -347,17 +367,21 @@ export default function LoginForm() {
                                 </div>
                                 <span className={`text-[10px] uppercase tracking-widest ${step >= 2 ? 'text-gold' : 'text-gray-500'}`}>College</span>
                             </div>
-                            <div className={`w-8 h-[1px] mt-[-20px] ${step >= 3 ? 'bg-gold' : 'bg-white/10'}`} />
-                            <div className="flex flex-col items-center">
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm mb-2 transition-all ${step >= 3 ? 'bg-gold text-black' : 'bg-white/10 text-gray-400'}`}>
-                                    3
-                                </div>
-                                <span className={`text-[10px] uppercase tracking-widest ${step >= 3 ? 'text-gold' : 'text-gray-500'}`}>Payment</span>
-                            </div>
+
                         </div>
 
                         {step === 1 && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <form onSubmit={(e) => { e.preventDefault(); handleNext(); }} className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
+                                {/* Dev Autofill Button (Top Right of Form) */}
+                                <button
+                                    type="button"
+                                    onClick={handleDevFill}
+                                    className="absolute -top-10 right-0 text-xs bg-white/10 hover:bg-gold/20 text-gold/50 hover:text-gold px-2 py-1 rounded transition-colors"
+                                    title="Auto-fill with dummy data"
+                                >
+                                    ⚡ Dev Fill
+                                </button>
+
                                 <div className="md:col-span-2 space-y-2">
                                     <label className="text-xs text-gray-400 ml-1">Name*</label>
                                     <input
@@ -420,15 +444,15 @@ export default function LoginForm() {
                                 </div>
 
                                 <div className="md:col-span-2 mt-4">
-                                    <Button onClick={handleNext} className="w-full py-4 bg-gold text-black font-cinzel rounded-xl hover:bg-white transition-all">
+                                    <Button type="submit" className="w-full py-4 bg-gold text-black font-cinzel rounded-xl hover:bg-white transition-all">
                                         Next (College Details)
                                     </Button>
                                 </div>
-                            </div>
+                            </form>
                         )}
 
                         {step === 2 && (
-                            <div className="grid grid-cols-1 gap-4">
+                            <form onSubmit={(e) => { e.preventDefault(); handleNext(); }} className="grid grid-cols-1 gap-4">
                                 <div className="space-y-2">
                                     <label className="text-xs text-gray-400 ml-1">College Name*</label>
                                     <input
@@ -461,83 +485,27 @@ export default function LoginForm() {
                                 <div className="space-y-2">
                                     <label className="text-xs text-gray-400 ml-1">Accommodation*</label>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <button onClick={() => handleChange('accommodation', 'yes')} className={`p-3 rounded-lg border ${formData.accommodation === 'yes' ? 'bg-gold/20 border-gold text-white' : 'border-white/10 text-gray-400'}`}>
+                                        <button type="button" onClick={() => handleChange('accommodation', 'yes')} className={`p-3 rounded-lg border ${formData.accommodation === 'yes' ? 'bg-gold/20 border-gold text-white' : 'border-white/10 text-gray-400'}`}>
                                             Yes <span className="text-[10px] block text-red-400">(Paid ₹999)</span>
                                         </button>
-                                        <button onClick={() => handleChange('accommodation', 'no')} className={`p-3 rounded-lg border ${formData.accommodation === 'no' ? 'bg-gold/20 border-gold text-white' : 'border-white/10 text-gray-400'}`}>
+                                        <button type="button" onClick={() => handleChange('accommodation', 'no')} className={`p-3 rounded-lg border ${formData.accommodation === 'no' ? 'bg-gold/20 border-gold text-white' : 'border-white/10 text-gray-400'}`}>
                                             No <span className="text-[10px] block opacity-50">Local (₹399)</span>
                                         </button>
                                     </div>
                                 </div>
 
                                 <div className="flex gap-4 mt-6">
-                                    <Button variant="ghost" onClick={() => setStep(1)} className="flex-1 border border-white/20">Back</Button>
-                                    <Button onClick={handleNext} className="flex-[2] py-4 bg-gold text-black font-cinzel rounded-xl hover:bg-white transition-all">
-                                        Next (Payment)
+                                    <Button type="button" variant="ghost" onClick={() => setStep(1)} className="flex-1 border border-white/20">Back</Button>
+                                    <Button type="submit" disabled={isLoading} className="flex-[2] py-4 bg-gold text-black font-cinzel rounded-xl hover:bg-white transition-all">
+                                        {isLoading ? 'Registering...' : 'Complete Registration'}
                                     </Button>
                                 </div>
-                            </div>
+                            </form>
                         )}
-
-                        {step === 3 && (
-                            <div className="grid grid-cols-1 gap-6 text-center">
-                                <div className="bg-white/5 p-6 rounded-xl border border-gold/30">
-                                    <h3 className="text-gold font-cinzel text-xl mb-2">
-                                        Amount to Pay: <span className="text-white text-2xl">₹{formData.accommodation === 'yes' ? '999' : '399'}</span>
-                                    </h3>
-                                    <p className="text-xs text-gray-400 mb-4">Scan the QR code below to pay via UPI</p>
-
-                                    {/* Placeholder QR - Replace with actual image */}
-                                    <div className="w-48 h-48 bg-white mx-auto mb-4 flex items-center justify-center rounded-lg">
-                                        <p className="text-black font-bold text-xs">QR CODE HERE</p>
-                                    </div>
-
-                                    <div className="space-y-4 text-left">
-                                        <div>
-                                            <label className="text-xs text-gray-400 ml-1">Transaction ID (UTR)*</label>
-                                            <input
-                                                className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:border-gold/50 outline-none"
-                                                placeholder="Enter 12-digit UTR"
-                                                value={paymentState.paymentId}
-                                                onChange={(e) => setPaymentState(prev => ({ ...prev, paymentId: e.target.value }))}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-xs text-gray-400 ml-1">Screenshot*</label>
-                                            <div className="relative border border-dashed border-white/20 rounded-lg p-4 hover:bg-white/5 transition-colors cursor-pointer">
-                                                <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    onChange={handleFileChange}
-                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                                />
-                                                <div className="flex flex-col items-center justify-center text-gray-400">
-                                                    {paymentState.preview ? (
-                                                        <img src={paymentState.preview} alt="Preview" className="h-32 object-contain" />
-                                                    ) : (
-                                                        <>
-                                                            <span className="text-xs">Click to upload screenshot</span>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="flex gap-4">
-                                    <Button variant="ghost" onClick={() => setStep(2)} className="flex-1 border border-white/20">Back</Button>
-                                    <Button onClick={handleSubmit} disabled={isLoading} className="flex-[2] py-4 bg-gold text-black font-cinzel rounded-xl hover:bg-white transition-all">
-                                        {isLoading ? 'Verifying...' : 'Complete Registration'}
-                                    </Button>
-                                </div>
-                            </div>
-                        )}
-
                     </motion.div>
                 )}
             </AnimatePresence>
 
-        </div>
+        </div >
     );
 }

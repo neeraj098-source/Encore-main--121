@@ -12,6 +12,7 @@ import { useSearchParams } from "next/navigation";
 interface OrderItem {
     id: string;
     eventName: string;
+    eventSlug?: string;
     price: number;
 }
 
@@ -106,8 +107,20 @@ function OrdersContent() {
                                     {order.items.map((item) => (
                                         <div key={item.id} className="flex gap-4 items-center">
                                             <div className="w-16 h-16 bg-gray-800 rounded relative overflow-hidden">
-                                                {/* Placeholder image logic similar to cart */}
-                                                <Image src="/images/logo.png" alt="Event" fill className="object-cover opacity-50" />
+                                                {/* Dynamic Event Image */}
+                                                <Image
+                                                    src={`/images/event/${[
+                                                        "darpan", "reel-making", "treasure-hunt", "marketing-mania", "picture-story", "dance-battle",
+                                                        "debate", "open-stage", "solo-singing", "band-war", "graffiti", "face-painting", "monoact",
+                                                        "tshirt-painting", "case-study", "live-sketching", "pageant", "relay-rangoli", "nukkad",
+                                                        "rap-battle", "mimicry", "solo-dance", "short-film", "auction", "mun", "twist-a-tale",
+                                                        "group-dance", "jam"
+                                                    ].indexOf(item.eventSlug ?? "") + 1}.jpg`}
+                                                    alt={item.eventName}
+                                                    fill
+                                                    className="object-cover opacity-80"
+                                                    onError={(e) => (e.target as HTMLImageElement).src = '/images/logo.png'}
+                                                />
                                             </div>
                                             <div>
                                                 <h3 className="text-lg font-marcellus text-white">{item.eventName}</h3>

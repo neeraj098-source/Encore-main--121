@@ -11,6 +11,8 @@ export default function AdminPanel() {
     const [users, setUsers] = useState<any[]>([]);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [leaderboard, setLeaderboard] = useState<any[]>([]); // Leaderboard Data
+    const [searchQuery, setSearchQuery] = useState('');
 
     // Global Modal State (Success/Error messages)
     const [modalState, setModalState] = useState<{
@@ -40,6 +42,10 @@ export default function AdminPanel() {
         password: '' // New Password (Optional)
     });
 
+    // Verify Modal State
+    const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
+    const [verifyingUser, setVerifyingUser] = useState<any>(null);
+
     const fetchUsers = async () => {
         try {
             const res = await fetch(`/api/admin/users?secret=${secret}`);
@@ -49,6 +55,18 @@ export default function AdminPanel() {
             }
         } catch (error) {
             console.error("Auto-refresh failed", error);
+        }
+    };
+
+    const fetchLeaderboard = async () => {
+        try {
+            const res = await fetch('/api/admin/leaderboard');
+            if (res.ok) {
+                const data = await res.json();
+                setLeaderboard(data);
+            }
+        } catch (error) {
+            console.error("Leaderboard fetch failed", error);
         }
     };
 
@@ -63,6 +81,7 @@ export default function AdminPanel() {
                     if (res.ok) {
                         res.json().then(data => {
                             setUsers(data.users);
+                            fetchLeaderboard(); // Fetch Leaderboard on Auto-Login
                             setIsAuthenticated(true);
                         });
                     }
@@ -84,6 +103,7 @@ export default function AdminPanel() {
             if (res.ok) {
                 const data = await res.json();
                 setUsers(data.users);
+                fetchLeaderboard(); // Fetch Leaderboard on Login
                 setIsAuthenticated(true);
                 localStorage.setItem('admin_secret', secret);
             } else {
@@ -100,6 +120,11 @@ export default function AdminPanel() {
 
     // --- Actions ---
 
+    const openVerifyModal = (user: any) => {
+        setVerifyingUser(user);
+        setIsVerifyModalOpen(true);
+    };
+
     const handleVerifyUser = async (userId: string) => {
         try {
             const res = await fetch('/api/admin/users', {
@@ -114,6 +139,7 @@ export default function AdminPanel() {
 
             if (res.ok) {
                 setModalState({ isOpen: true, title: "Verified", message: "User payment verified successfully!", type: "success" });
+                setIsVerifyModalOpen(false); // Close verify modal
                 fetchUsers();
             } else {
                 setModalState({ isOpen: true, title: "Error", message: "Failed to verify user", type: "error" });
@@ -162,9 +188,18 @@ export default function AdminPanel() {
         }
     };
 
-    const handleDeleteUser = async (userId: string) => {
-        if (!confirm("Are you sure you want to DELETE this user? This cannot be undone.")) return;
+    const confirmDeleteUser = (userId: string) => {
+        setModalState({
+            isOpen: true,
+            title: "Confirm Deletion",
+            message: "Are you sure you want to DELETE this user? This action cannot be undone.",
+            type: "warning",
+            actionLabel: "Yes, Delete",
+            onAction: () => handleDeleteUser(userId)
+        });
+    };
 
+    const handleDeleteUser = async (userId: string) => {
         try {
             const res = await fetch(`/api/admin/users?secret=${secret}&userId=${userId}`, {
                 method: 'DELETE'
@@ -191,6 +226,8 @@ export default function AdminPanel() {
                     title={modalState.title}
                     message={modalState.message}
                     type={modalState.type}
+                    actionLabel={modalState.actionLabel}
+                    onAction={modalState.onAction}
                 />
                 <div className="bg-white/10 p-8 rounded-xl border border-white/20 w-full max-w-md">
                     <h1 className="text-2xl font-cinzel text-gold mb-6 text-center">Admin Access</h1>
@@ -217,7 +254,132 @@ export default function AdminPanel() {
                 title={modalState.title}
                 message={modalState.message}
                 type={modalState.type}
+                actionLabel={modalState.actionLabel}
+                onAction={modalState.onAction}
             />
+
+            {/* VERIFY / DETAILS MODAL */}
+            {isVerifyModalOpen && verifyingUser && (
+                <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                    <div className="bg-[#111] border border-gold/40 rounded-xl w-full max-w-2xl shadow-2xl relative flex flex-col max-h-[90vh]">
+                        <div className="p-6 border-b border-white/10 flex justify-between items-center">
+                            <h2 className="text-2xl font-cinzel text-gold">Payment Details</h2>
+                            <button onClick={() => setIsVerifyModalOpen(false)} className="text-gray-400 hover:text-white">
+                                <X size={24} />
+                            </button>
+                        </div>
+
+                        <div className="p-6 overflow-y-auto space-y-6">
+                            {/* User Header */}
+                            <div className="flex justify-between items-center bg-white/5 p-6 rounded-lg border border-white/10">
+                                <div>
+                                    <h3 className="text-2xl font-cinzel text-white uppercase mb-1">{verifyingUser.name}</h3>
+                                    <p className="text-sm text-gray-400 font-mono mb-2">{verifyingUser.email}</p>
+                                    <p className="text-xs text-gray-500 uppercase tracking-widest">{verifyingUser.college}</p>
+                                    <p className="text-xs text-gray-500">{verifyingUser.phone}</p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-xs text-gray-400 uppercase tracking-widest mb-1">Total Paid (Invested)</p>
+                                    {/* Calculated Total: Registration (if verified) + Paid Orders */}
+                                    <p className="text-4xl font-mono text-gold mb-2">
+                                        ₹{
+                                            (verifyingUser.paymentVerified ? (verifyingUser.totalPaid || (verifyingUser.accommodation === 'yes' ? 999 : 399)) : 0) +
+                                            (verifyingUser.orders?.reduce((sum: number, order: any) => order.status === 'PAID' ? sum + order.totalAmount : sum, 0) || 0)
+                                        }
+                                    </p>
+                                    {verifyingUser.paymentVerified ? (
+                                        <span className="text-xs text-green-400 bg-green-900/20 border border-green-500/30 px-3 py-1 rounded uppercase tracking-widest font-bold">Verified</span>
+                                    ) : (
+                                        <span className="text-xs text-red-400 bg-red-900/20 border border-red-500/30 px-3 py-1 rounded uppercase tracking-widest font-bold">Pending Verification</span>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* 1. Fest Pass Details */}
+                            <div className="bg-[#151515] p-5 rounded-lg border border-white/10 relative overflow-hidden group">
+                                <div className="absolute top-0 left-0 w-1 h-full bg-gold" />
+                                <h4 className="text-gold font-cinzel text-sm mb-4 uppercase tracking-wider">Fest Pass</h4>
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <p className="text-xl text-white font-cinzel mb-1">{verifyingUser.accommodation === 'yes' ? 'Accommodation Pass' : 'Basic Pass'}</p>
+                                        <p className="text-xs text-gray-500 uppercase tracking-widest">{verifyingUser.accommodation === 'yes' ? 'Includes 3-Day Stay + Entry' : 'Entry Only'}</p>
+                                    </div>
+                                    <span className="text-2xl font-mono text-white">₹{verifyingUser.accommodation === 'yes' ? 999 : 399}</span>
+                                </div>
+                            </div>
+
+                            {/* 2. Order History */}
+                            <div className="bg-[#151515] p-5 rounded-lg border border-white/10 relative overflow-hidden">
+                                <div className="absolute top-0 left-0 w-1 h-full bg-purple-500" />
+                                <h4 className="text-purple-400 font-cinzel text-sm mb-4 uppercase tracking-wider">Order History</h4>
+
+                                {(!verifyingUser.orders || verifyingUser.orders.length === 0) ? (
+                                    <p className="text-gray-500 text-sm italic">No additional event orders.</p>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {verifyingUser.orders.map((order: any) => (
+                                            <div key={order.id} className="flex justify-between items-center border-b border-white/5 pb-2 last:border-0 last:pb-0">
+                                                <div>
+                                                    <p className="text-gray-400 text-xs mb-1">{new Date(order.createdAt).toLocaleDateString()}</p>
+                                                    <div className="flex flex-col">
+                                                        {order.items.map((item: any, i: number) => (
+                                                            <span key={i} className="text-white text-sm font-marcellus">{item.eventName}</span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className={order.status === 'PAID' ? 'text-green-500 text-xs font-bold mb-1' : 'text-yellow-500 text-xs font-bold mb-1'}>
+                                                        {order.status}
+                                                    </p>
+                                                    <p className="text-lg font-mono text-white">₹{order.totalAmount}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                <div className="mt-4 pt-3 border-t border-white/10 flex justify-between items-center">
+                                    <span className="text-gray-400 text-xs uppercase">Total Orders Value</span>
+                                    <span className="text-xl font-mono text-white">
+                                        ₹{verifyingUser.orders?.reduce((sum: number, o: any) => o.status === 'PAID' ? sum + o.totalAmount : sum, 0) || 0}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Payment Screenshot */}
+                            {verifyingUser.paymentScreenshot && (
+                                <div className="bg-[#151515] p-5 rounded-lg border border-white/10 relative overflow-hidden">
+                                    <div className="absolute top-0 left-0 w-1 h-full bg-blue-500" />
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h4 className="text-blue-400 font-cinzel text-sm uppercase tracking-wider">Payment Proof</h4>
+                                        <button
+                                            onClick={() => setViewingScreenshot(verifyingUser.paymentScreenshot)}
+                                            className="text-xs text-blue-400 hover:text-white underline"
+                                        >
+                                            View Fullscreen
+                                        </button>
+                                    </div>
+                                    <div className="relative h-48 w-full rounded-lg overflow-hidden border border-white/10 cursor-pointer" onClick={() => setViewingScreenshot(verifyingUser.paymentScreenshot)}>
+                                        <img
+                                            src={verifyingUser.paymentScreenshot}
+                                            alt="Proof"
+                                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="p-6 border-t border-white/10 flex justify-end gap-3 bg-[#111]">
+                            <Button variant="outline" onClick={() => setIsVerifyModalOpen(false)}>Close</Button>
+                            {!verifyingUser.paymentVerified && (
+                                <Button onClick={() => handleVerifyUser(verifyingUser.id)} className="bg-green-600 text-white hover:bg-green-700 font-bold px-8">
+                                    VERIFY USER
+                                </Button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* SCREENSHOT PREVIEW MODAL */}
             {viewingScreenshot && (
@@ -295,12 +457,24 @@ export default function AdminPanel() {
             )}
 
             <div className="max-w-7xl mx-auto">
-                <div className="flex justify-between items-center mb-8">
+                <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                     <div className="flex items-center gap-4">
                         <h1 className="text-3xl font-cinzel text-gold">Encore 26 Admin</h1>
                         <span className="text-xs text-green-400 font-mono bg-green-900/30 px-2 py-1 rounded border border-green-500/30">LIVE</span>
                     </div>
-                    <Button variant="ghost" onClick={() => { setIsAuthenticated(false); localStorage.removeItem('admin_secret'); }}>Logout</Button>
+
+                    <div className="flex items-center gap-4 w-full md:w-auto">
+                        <div className="relative w-full md:w-64">
+                            <input
+                                type="text"
+                                placeholder="Search by ID, Name, Email..."
+                                className="w-full bg-white/5 border border-white/10 rounded-lg py-2 px-4 text-sm text-white focus:border-gold outline-none transition-colors"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
+                        <Button variant="ghost" onClick={() => { setIsAuthenticated(false); localStorage.removeItem('admin_secret'); }}>Logout</Button>
+                    </div>
                 </div>
 
                 <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden mb-8">
@@ -308,16 +482,23 @@ export default function AdminPanel() {
                         <table className="w-full text-left">
                             <thead className="bg-white/10 text-gold font-cinzel sticky top-0 backdrop-blur-md">
                                 <tr>
-                                    <th className="p-4">Name</th>
-                                    <th className="p-4">Email</th>
-                                    <th className="p-4">College</th>
+                                    <th className="p-4">User</th>
+                                    <th className="p-4">Contact</th>
+                                    <th className="p-4">Reference</th>
                                     <th className="p-4">Paid</th>
-                                    <th className="p-4">Events</th>
                                     <th className="p-4">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/10">
-                                {users.map((user) => {
+                                {users.filter(user => {
+                                    const query = searchQuery.toLowerCase();
+                                    return (
+                                        (user.name?.toLowerCase() || '').includes(query) ||
+                                        (user.email?.toLowerCase() || '').includes(query) ||
+                                        (user.id?.toLowerCase() || '').includes(query) ||
+                                        (user.paymentId?.toLowerCase() || '').includes(query)
+                                    );
+                                }).map((user) => {
                                     const totalPaid = user.orders?.reduce((sum: number, order: any) => {
                                         return order.status === 'PAID' ? sum + order.totalAmount : sum;
                                     }, 0) || 0;
@@ -327,12 +508,18 @@ export default function AdminPanel() {
 
                                     return (
                                         <tr key={user.id} className="hover:bg-white/5">
-                                            <td className="p-4 font-medium">
-                                                {user.name}
-                                                <div className="text-[10px] text-gray-500">{user.paymentId || 'No IDs'}</div>
+                                            <td className="p-4">
+                                                <div className="font-medium text-white">{user.name}</div>
+                                                <div className="text-xs text-gray-500 font-mono mt-1">{user.id}</div>
                                             </td>
-                                            <td className="p-4 text-gray-400 text-sm">{user.email}</td>
-                                            <td className="p-4 text-gray-400 text-sm">{user.college || '-'}</td>
+                                            <td className="p-4">
+                                                <div className="text-sm text-gray-300">{user.email}</div>
+                                                <div className="text-xs text-gray-500">{user.phone || 'N/A'}</div>
+                                            </td>
+                                            <td className="p-4">
+                                                <div className="text-sm text-gray-400">{user.college || '-'}</div>
+                                                {user.paymentId && <div className="text-[10px] text-gray-600 mt-1 font-mono">PID: {user.paymentId}</div>}
+                                            </td>
 
                                             {/* Payment & Verification Status */}
                                             <td className="p-4">
@@ -344,13 +531,21 @@ export default function AdminPanel() {
                                                         <div className="flex items-center gap-2">
                                                             <span className="text-xs text-red-400 bg-red-900/20 px-2 py-0.5 rounded">Pending</span>
                                                             <button
-                                                                onClick={() => handleVerifyUser(user.id)}
+                                                                onClick={() => openVerifyModal(user)}
                                                                 className="text-[10px] bg-green-600/20 text-green-400 border border-green-600/50 px-2 rounded hover:bg-green-600/30 transition-colors"
                                                             >
                                                                 Verify
                                                             </button>
                                                         </div>
                                                     )}
+                                                    {/* Always Show Details Button */}
+                                                    <button
+                                                        onClick={() => openVerifyModal(user)}
+                                                        className="text-[10px] text-gray-400 underline hover:text-white w-fit mt-1"
+                                                    >
+                                                        Details
+                                                    </button>
+
                                                     {user.paymentScreenshot && (
                                                         <button
                                                             onClick={() => setViewingScreenshot(user.paymentScreenshot)}
@@ -371,7 +566,7 @@ export default function AdminPanel() {
                                                     <Edit2 size={16} />
                                                 </button>
                                                 <button
-                                                    onClick={() => handleDeleteUser(user.id)}
+                                                    onClick={() => confirmDeleteUser(user.id)}
                                                     className="p-2 bg-red-500/10 text-red-400 rounded hover:bg-red-500/20"
                                                     title="Delete User"
                                                 >
@@ -381,6 +576,40 @@ export default function AdminPanel() {
                                         </tr>
                                     );
                                 })}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {/* Leaderboard Section */}
+                <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden mb-12">
+                    <h2 className="text-2xl font-cinzel text-gold p-6 border-b border-white/10">🏆 CA Leaderboard</h2>
+                    <div className="max-h-[50vh] overflow-auto">
+                        <table className="w-full text-left">
+                            <thead className="bg-white/10 text-gold font-cinzel sticky top-0 backdrop-blur-md">
+                                <tr>
+                                    <th className="p-4">Rank</th>
+                                    <th className="p-4">CA Name</th>
+                                    <th className="p-4">College</th>
+                                    <th className="p-4">Code</th>
+                                    <th className="p-4 text-right">Referrals</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-white/10">
+                                {leaderboard.map((ca, index) => (
+                                    <tr key={ca.id} className="hover:bg-white/5">
+                                        <td className="p-4 font-mono text-gold">#{index + 1}</td>
+                                        <td className="p-4 font-medium">{ca.name}</td>
+                                        <td className="p-4 text-gray-400 text-sm">{ca.college}</td>
+                                        <td className="p-4 font-mono text-xs">{ca.referralCode}</td>
+                                        <td className="p-4 text-right font-bold text-gold text-lg">{ca.referrals}</td>
+                                    </tr>
+                                ))}
+                                {leaderboard.length === 0 && (
+                                    <tr>
+                                        <td colSpan={5} className="p-8 text-center text-gray-500">No data available yet</td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>

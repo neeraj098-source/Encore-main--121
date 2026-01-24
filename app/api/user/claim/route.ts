@@ -25,8 +25,32 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Reward already claimed!' }, { status: 400 });
         }
 
+        const validTasks = ['taskInsta', 'taskLinkedIn', 'taskX', 'taskFacebook', 'taskCart', 'taskCart5', 'taskCart10'];
+        if (!validTasks.includes(task)) {
+            return NextResponse.json({ error: 'Invalid Task' }, { status: 400 });
+        }
+
+        // Special Verification for Cart Quest
+        if (task.startsWith('taskCart')) {
+            const userWithCart = await prisma.user.findUnique({
+                where: { email },
+                include: { cart: { include: { items: true } } }
+            });
+
+            const cartCount = userWithCart?.cart?.items.length || 0;
+            let required = 3;
+            if (task === 'taskCart5') required = 5;
+            if (task === 'taskCart10') required = 10;
+
+            if (cartCount < required) {
+                return NextResponse.json({ error: `You need ${required - cartCount} more events in cart!` }, { status: 400 });
+            }
+        }
+
         // Award Coins
-        const REWARD_AMOUNT = 50;
+        let REWARD_AMOUNT = 50;
+        if (task === 'taskCart5') REWARD_AMOUNT = 100;
+        if (task === 'taskCart10') REWARD_AMOUNT = 150;
 
         await prisma.user.update({
             where: { email },

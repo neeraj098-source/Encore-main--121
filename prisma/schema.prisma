@@ -36,7 +36,12 @@ model User {
   // Social Rewards
   taskInsta       Boolean  @default(false)
   taskLinkedIn    Boolean  @default(false)
-  
+  taskX           Boolean  @default(false)
+  taskFacebook    Boolean  @default(false)
+  taskCart        Boolean  @default(false)
+  taskCart5       Boolean  @default(false)
+  taskCart10      Boolean  @default(false)
+
   createdAt       DateTime @default(now())
 
   // New Cart & Order System
@@ -72,7 +77,9 @@ model Order {
   items         OrderItem[]
   totalAmount   Int
   status        String      @default("PENDING") // PENDING, PAID, FAILED
-  paymentId     String?     // External Payment ID (Razorpay etc)
+  paymentId     String?     // External Payment ID (Razorpay etc) or UTR
+  paymentScreenshot String? // Base64 or URL of payment proof
+  passType      String?     // 'basic' (99) or 'premium' (399) or null
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 }

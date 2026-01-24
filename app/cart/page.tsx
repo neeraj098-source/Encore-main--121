@@ -99,12 +99,12 @@ export default function CartPage() {
                                         <div className="w-16 h-16 relative rounded-md overflow-hidden bg-gray-800">
                                             <Image
                                                 src={`/images/event/${[
-                                                        "darpan", "reel-making", "treasure-hunt", "marketing-mania", "picture-story", "dance-battle",
-                                                        "debate", "open-stage", "solo-singing", "band-war", "graffiti", "face-painting", "monoact",
-                                                        "tshirt-painting", "case-study", "live-sketching", "pageant", "relay-rangoli", "nukkad",
-                                                        "rap-battle", "mimicry", "solo-dance", "short-film", "auction", "mun", "twist-a-tale",
-                                                        "group-dance", "jam"
-                                                    ].indexOf(item.eventSlug) + 1
+                                                    "darpan", "reel-making", "treasure-hunt", "marketing-mania", "picture-story", "dance-battle",
+                                                    "debate", "open-stage", "solo-singing", "band-war", "graffiti", "face-painting", "monoact",
+                                                    "tshirt-painting", "case-study", "live-sketching", "pageant", "relay-rangoli", "nukkad",
+                                                    "rap-battle", "mimicry", "solo-dance", "short-film", "auction", "mun", "twist-a-tale",
+                                                    "group-dance", "jam"
+                                                ].indexOf(item.eventSlug) + 1
                                                     }.jpg`} // Quick hack for image mapping based on slug order provided in data.ts or just a placeholder
                                                 alt={item.eventName}
                                                 fill
@@ -155,10 +155,10 @@ export default function CartPage() {
                             </div>
 
                             <button
-                                onClick={() => router.push("/checkout")} // Will need a checkout page/route later
-                                className="w-full py-3 bg-gradient-to-r from-gold to-amber-600 text-black font-bold rounded-lg hover:scale-[1.02] transition-transform flex items-center justify-center gap-2"
+                                onClick={() => router.push("/checkout")}
+                                className="w-full py-3 bg-gradient-to-r from-gold to-yellow-600 text-black font-bold rounded-lg hover:scale-[1.02] transition-transform flex items-center justify-center gap-2 shadow-lg shadow-gold/20"
                             >
-                                Proceed to Checkout
+                                Proceed to Buy
                                 <ArrowRight size={20} />
                             </button>
                         </div>

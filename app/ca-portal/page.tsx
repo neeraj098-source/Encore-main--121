@@ -71,7 +71,8 @@ export default function CAPortal() {
                         onClick={() => setFormData({
                             name: `Ambassador ${Math.floor(Math.random() * 100)}`,
                             email: `ca${Math.floor(Math.random() * 1000)}@test.com`,
-                            college: 'IET Lucknow'
+                            college: 'IET Lucknow',
+                            phone: '9999999999'
                         })}
                         className="text-[10px] text-gray-600 hover:text-gold mt-2 underline"
                     >

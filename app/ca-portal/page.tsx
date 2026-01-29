@@ -64,12 +64,6 @@ export default function CAPortal() {
                 className="w-full max-w-md bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-2xl shadow-2xl relative z-10"
             >
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-cinzel text-gold mb-2">CA Portal</h1>
-                    <p className="text-gray-400 font-marcellus text-sm">Join the Elite Envoys of Encore</p>
-
-                </div>
-
-                <div className="text-center mb-8">
                     <h1 className="text-3xl font-cinzel text-gold mb-2">{isLogin ? 'CA Login' : 'CA Registration'}</h1>
                     <p className="text-gray-400 font-marcellus text-sm">{isLogin ? 'Access your Ambassador Dashboard' : 'Join the Elite Envoys of Encore'}</p>
                 </div>

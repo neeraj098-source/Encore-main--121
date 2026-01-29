@@ -27,7 +27,7 @@ export default function SponsorshipPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-4xl md:text-6xl font-cinzel text-gold mb-4"
                 >
-                    Our Sponsors
+                    Our Past Sponsors
                 </motion.h1>
                 <motion.p
                     initial={{ opacity: 0 }}

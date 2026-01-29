@@ -66,18 +66,7 @@ export default function CAPortal() {
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-cinzel text-gold mb-2">CA Portal</h1>
                     <p className="text-gray-400 font-marcellus text-sm">Join the Elite Envoys of Encore</p>
-                    {/* Dev Tool */}
-                    <button
-                        onClick={() => setFormData({
-                            name: `Ambassador ${Math.floor(Math.random() * 100)}`,
-                            email: `ca${Math.floor(Math.random() * 1000)}@test.com`,
-                            college: 'IET Lucknow',
-                            phone: '9999999999'
-                        })}
-                        className="text-[10px] text-gray-600 hover:text-gold mt-2 underline"
-                    >
-                        (Dev) Auto-Fill Form
-                    </button>
+
                 </div>
 
                 <div className="text-center mb-8">

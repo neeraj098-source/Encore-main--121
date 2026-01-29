@@ -52,31 +52,31 @@ export default function EventsPage() {
                     {[
                         {
                             title: "Dance Club",
-                            events: eventsData.filter(e => ["Dance", "Solo Dance", "Duo Dance", "Group Dance"].includes(e.category))
+                            events: eventsData.filter(e => ["Dance (Solo)", "Dance (Duo)", "Dance (Group)", "Dance"].includes(e.category))
                         },
                         {
                             title: "Music Club",
-                            events: eventsData.filter(e => ["Solo Singing", "Band War", "Rap Battle"].includes(e.category))
+                            events: eventsData.filter(e => ["Singing (Solo)", "Singing (Group)"].includes(e.category))
                         },
                         {
                             title: "Dramatics Club",
-                            events: eventsData.filter(e => ["Nukkad", "Monoact", "Skit", "Mime", "Open Stage", "Mimicry", "JAM"].includes(e.category))
+                            events: eventsData.filter(e => ["Dramatics (Group)", "Dramatics (Solo)", "Dramatics (Group/ Solo)", "Dramatics"].includes(e.category))
                         },
                         {
                             title: "Fine Arts Club",
-                            events: eventsData.filter(e => ["Art", "Face Painting", "Live Sketching", "Relay Rangoli", "Picture Story", "T-Shirt Painting"].includes(e.category))
+                            events: eventsData.filter(e => ["Art and Craft", "Art"].includes(e.category))
                         },
                         {
                             title: "Photography & Film Club",
-                            events: eventsData.filter(e => ["Photography", "Videography", "Short Film"].includes(e.category))
+                            events: eventsData.filter(e => ["Mirage (Solo)", "Mirage (Group)"].includes(e.category))
                         },
                         {
                             title: "Literary Club",
-                            events: eventsData.filter(e => ["Debate", "Twist a Tale"].includes(e.category))
+                            events: eventsData.filter(e => ["Literary (Solo)", "Literary (Individual / pair)", "Literary (Group)", "Literary (Solo/ Group)"].includes(e.category))
                         },
                         {
                             title: "Business & Management",
-                            events: eventsData.filter(e => ["Business", "Case Study", "Auction", "MUN"].includes(e.category))
+                            events: eventsData.filter(e => ["E-cell (Group)", "Business", "MUN"].includes(e.category))
                         },
                         {
                             title: "Special Events",
@@ -90,13 +90,13 @@ export default function EventsPage() {
                                 </h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                     {section.events.map((event, index) => (
-                                        <Link href={`/events/${event.slug || '#'}`} key={index}>
+                                        <Link href={`/events/${event.slug || '#'}`} key={event.slug || index}>
                                             <motion.div
-                                                initial={{ opacity: 0, y: 30 }}
+                                                initial={{ opacity: 0, y: 20 }}
                                                 whileInView={{ opacity: 1, y: 0 }}
-                                                viewport={{ once: true }}
-                                                transition={{ duration: 0.5, delay: index * 0.1 }}
-                                                className="group relative bg-gray-900 rounded-xl overflow-hidden border border-white/10 hover:border-gold/60 transition-all duration-300 h-full flex flex-col"
+                                                viewport={{ once: true, margin: "-50px" }}
+                                                transition={{ duration: 0.4, delay: Math.min(index * 0.05, 0.3) }}
+                                                className="group relative bg-gray-900 rounded-xl overflow-hidden border border-white/10 hover:border-gold/60 transition-all duration-300 h-full flex flex-col will-change-transform"
                                             >
                                                 {/* Image Container - Portrait Aspect Ratio */}
                                                 <div className="relative aspect-[4/5] w-full overflow-hidden">
@@ -104,7 +104,7 @@ export default function EventsPage() {
                                                         src={event.image}
                                                         alt={event.title}
                                                         fill
-                                                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                                        className="object-cover transition-transform duration-700 group-hover:scale-110 will-change-transform"
                                                     />
                                                     {/* Gradient Overlay */}
                                                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90" />

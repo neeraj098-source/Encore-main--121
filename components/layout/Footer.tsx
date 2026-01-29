@@ -35,7 +35,9 @@ export default function Footer() {
                                 <Facebook size={20} />
                             </a>
                             <a href="https://x.com/iet_encore" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gold transition-colors">
-                                <span className="font-bold text-lg">𝕏</span>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" />
+                                </svg>
                             </a>
                             <a href="https://linkedin.com/company/iet-encore" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gold transition-colors">
                                 <Linkedin size={20} />
@@ -49,7 +51,7 @@ export default function Footer() {
                         <ul className="space-y-4">
                             <li><Link href="/" className="text-gray-400 hover:text-gold transition-colors">Home</Link></li>
                             <li><Link href="/events" className="text-gray-400 hover:text-gold transition-colors">Events</Link></li>
-                            <li><Link href="/sponsorship" className="text-gray-400 hover:text-gold transition-colors">Sponsorship</Link></li>
+                            <li><Link href="/sponsorship" className="text-gray-400 hover:text-gold transition-colors">Sponsors</Link></li>
                             <li><Link href="/ca-portal" className="text-gray-400 hover:text-gold transition-colors">CA Portal</Link></li>
                         </ul>
                     </div>

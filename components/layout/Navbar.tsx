@@ -67,7 +67,7 @@ export default function Navbar() {
         { name: 'Home', href: '/' },
         { name: 'Events', href: '/events' },
         { name: 'About', href: '/about' },
-        { name: 'Sponsorship', href: '/sponsorship' },
+        { name: 'Sponsors', href: '/sponsorship' },
     ];
 
     const pathname = usePathname();
@@ -116,9 +116,12 @@ export default function Navbar() {
                             {/* CA Portal - Desktop */}
                             <Link
                                 href="/ca-portal"
-                                className="hidden lg:block text-xs font-marcellus text-gold hover:text-white transition-colors border border-gold/30 px-3 py-1 rounded-full bg-gold/5 hover:bg-gold/10 mr-2"
+                                className="hidden lg:block relative group overflow-hidden rounded-full p-[1px] mr-2"
                             >
-                                CA Portal
+                                <span className="absolute inset-0 bg-gradient-to-r from-gold via-purple-500 to-gold opacity-50 group-hover:opacity-100 transition-opacity duration-300 animate-gradient-xy"></span>
+                                <span className="relative block px-4 py-1.5 bg-black rounded-full text-xs font-marcellus text-gold group-hover:text-white transition-colors tracking-wide">
+                                    CA Portal
+                                </span>
                             </Link>
 
                             {/* Separator */}

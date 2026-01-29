@@ -4,7 +4,8 @@
 import { useState, useEffect, ReactNode } from 'react';
 import { Button } from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
-import { Trash2, Edit2, X } from 'lucide-react';
+import { Trash2, Edit2, X, Users as UsersIcon } from 'lucide-react';
+import { eventsData } from '@/lib/data';
 
 interface OrderItem {
     eventName: string;
@@ -58,6 +59,7 @@ export default function AdminPanel() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(false);
     const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]); // Leaderboard Data
+    const [teamStats, setTeamStats] = useState<{ eventSlug: string; count: number }[]>([]); // Team Stats
     const [searchQuery, setSearchQuery] = useState('');
 
     // Global Modal State (Success/Error messages)
@@ -116,6 +118,18 @@ export default function AdminPanel() {
         }
     };
 
+    const fetchTeamStats = async () => {
+        try {
+            const res = await fetch(`/api/admin/teams?secret=${secret}`);
+            if (res.ok) {
+                const data = await res.json();
+                setTeamStats(data);
+            }
+        } catch (error) {
+            console.error("Team stats fetch failed", error);
+        }
+    };
+
     // Auto-Login Effect
     useEffect(() => {
         const storedSecret = localStorage.getItem('admin_secret');
@@ -128,6 +142,7 @@ export default function AdminPanel() {
                         res.json().then(data => {
                             setUsers(data.users);
                             fetchLeaderboard(); // Fetch Leaderboard on Auto-Login
+                            fetchTeamStats();
                             setIsAuthenticated(true);
                         });
                     }
@@ -146,6 +161,7 @@ export default function AdminPanel() {
                 const data = await res.json();
                 setUsers(data.users);
                 fetchLeaderboard(); // Fetch Leaderboard on Login
+                fetchTeamStats();
                 setIsAuthenticated(true);
                 localStorage.setItem('admin_secret', secret);
             } else {
@@ -657,6 +673,31 @@ export default function AdminPanel() {
                                 })}
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                {/* Team Statistics Section */}
+                <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden mb-8">
+                    <h2 className="text-2xl font-cinzel text-gold p-6 border-b border-white/10 flex items-center gap-2">
+                        <UsersIcon className="text-gold" /> Team Registrations
+                    </h2>
+                    <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {eventsData.filter(e => e.isTeam).map(event => {
+                            const stat = teamStats.find(s => s.eventSlug === event.slug);
+                            const count = stat ? stat.count : 0;
+
+                            return (
+                                <div key={event.slug} className={`p-4 rounded-lg border ${count > 0 ? 'bg-gold/10 border-gold/40' : 'bg-white/5 border-white/10'} flex justify-between items-center`}>
+                                    <div>
+                                        <h3 className="font-cinzel text-white text-sm">{event.title}</h3>
+                                        <p className="text-xs text-gray-500">{event.category}</p>
+                                    </div>
+                                    <span className={`text-2xl font-mono font-bold ${count > 0 ? 'text-gold' : 'text-gray-600'}`}>
+                                        {count}
+                                    </span>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
 

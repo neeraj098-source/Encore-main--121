@@ -110,10 +110,11 @@ export default function CheckoutPage() {
                 const data = await res.json();
                 router.push(`/orders?success=true&orderId=${data.orderId}`);
             } else {
+                const errorData = await res.json();
                 setModalState({
                     isOpen: true,
                     title: "Order Failed",
-                    message: "Failed to place order. Please try again.",
+                    message: errorData.error || "Failed to place order. Please try again.",
                     type: "error"
                 });
             }
@@ -294,13 +295,13 @@ export default function CheckoutPage() {
                                         <div key={item.id} className="flex items-center gap-4 bg-black/20 p-3 rounded-lg border border-white/5">
                                             <div className="w-12 h-12 relative bg-gray-800 rounded overflow-hidden shrink-0">
                                                 <Image
-                                                    src={`/images/event/${[
+                                                    src={`/images/event/${Math.max(1, [
                                                         "darpan", "reel-making", "treasure-hunt", "marketing-mania", "picture-story", "dance-battle",
                                                         "debate", "open-stage", "solo-singing", "band-war", "graffiti", "face-painting", "monoact",
                                                         "tshirt-painting", "case-study", "live-sketching", "pageant", "relay-rangoli", "nukkad",
                                                         "rap-battle", "mimicry", "solo-dance", "short-film", "auction", "mun", "twist-a-tale",
                                                         "group-dance", "jam"
-                                                    ].indexOf(item.eventSlug) + 1}.jpg`}
+                                                    ].indexOf(item.eventSlug) + 1)}.jpg`}
                                                     alt={item.eventName}
                                                     fill
                                                     className="object-cover"

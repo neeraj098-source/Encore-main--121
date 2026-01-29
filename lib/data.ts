@@ -2,11 +2,11 @@ export const eventsData = [
     {
         title: "Darpan",
         slug: "darpan",
-        category: "Photography",
+        category: "Mirage (Solo)",
         price: 150,
         image: "/images/event/1.jpg",
         description: "Enthusiastic Shutterbugs, it's your turn to grasp your camera and make your eyes act like a shutter and your mind like a lens. Capture what it actually feels like, not what it looks like.",
-        venue: "Online / Campus",
+        venue: "Kalam Hall / Centre stage / Auditorium / LT11",
         time: "All Day",
         rules: [
             "Theme: Open",
@@ -23,33 +23,36 @@ export const eventsData = [
     {
         title: "Reel Making",
         slug: "reel-making",
-        category: "Videography",
-        price: 200,
+        category: "Mirage (Group)",
+        price: 250,
         image: "/images/event/2.jpg",
         description: "Create engaging reels that tell a story in seconds.",
-        venue: "Online / Campus",
+        venue: "Kalam Hall / Centre",
         time: "All Day",
-        rules: ["Time limit: 60 seconds", "Original content only"]
+        rules: ["Time limit: 60 seconds", "Original content only"],
+        isTeam: true,
+        minSize: 1,
+        maxSize: 4
     },
     {
         title: "Natraj",
         slug: "solo-dance",
-        category: "Solo Dance",
+        category: "Dance (Solo)",
         price: 200,
         image: "/images/event/23.jpg",
         description: "Solo dance performance.",
-        venue: "Arena / Secondary Stage / Auditorium",
+        venue: "Arena / Secondary stage / Auditorium",
         time: "TBA",
         rules: []
     },
     {
         title: "Rhythm Rebels",
         slug: "duo-dance",
-        category: "Duo Dance",
-        price: 300, // 150 per person * 2
-        image: "/images/event/6.jpg", // Placeholder (using Dance Battle)
+        category: "Dance (Duo)",
+        price: 300,
+        image: "/images/event/rhythm_rebels.jpg",
         description: "Duo dance competition.",
-        venue: "Arena / Secondary Stage / Auditorium",
+        venue: "Arena / Secondary stage / Auditorium",
         time: "TBA",
         rules: [],
         isTeam: true,
@@ -59,8 +62,8 @@ export const eventsData = [
     {
         title: "Raqs",
         slug: "group-dance",
-        category: "Group Dance",
-        price: 600, // 120 per person * 5 (min size)
+        category: "Dance (Group)",
+        price: 600, // Min 5 * 120
         image: "/images/event/28.jpg",
         description: "Group dance competition.",
         venue: "Main Stage",
@@ -68,13 +71,13 @@ export const eventsData = [
         rules: [],
         isTeam: true,
         minSize: 5,
-        maxSize: 15
+        maxSize: 20
     },
     {
         title: "Relay Rangoli",
         slug: "relay-rangoli",
-        category: "Relay Rangoli",
-        price: 200, // 50 per person * 4
+        category: "Art and Craft",
+        price: 200, // 4 * 50
         image: "/images/event/18.jpg",
         description: "Team rangoli competition.",
         venue: "Auditorium",
@@ -85,10 +88,10 @@ export const eventsData = [
         maxSize: 4
     },
     {
-        title: "Pratibimb", // Live Sketching
+        title: "Live Sketching",
         slug: "live-sketching",
-        category: "Live Sketching",
-        price: 100, // 100 per person
+        category: "Art and Craft",
+        price: 100,
         image: "/images/event/16.jpg",
         description: "Sketch live subjects.",
         venue: "Arena / Garden",
@@ -98,19 +101,19 @@ export const eventsData = [
     {
         title: "Brush the Theme",
         slug: "brush-the-theme",
-        category: "Art",
-        price: 100, // 100 per person
-        image: "/images/event/11.jpg", // Reusing graffiti img or need new
+        category: "Art and Craft",
+        price: 100,
+        image: "/images/event/11.jpg",
         description: "Painting competition based on a theme.",
         venue: "Arena / Garden / LT",
         time: "Day-2, 10 AM",
         rules: []
     },
     {
-        title: "Mukhauta", // Face Painting
+        title: "Face Painting",
         slug: "face-painting",
-        category: "Face Painting",
-        price: 100, // 100 per person
+        category: "Art and Craft",
+        price: 100,
         image: "/images/event/12.jpg",
         description: "Face painting competition.",
         venue: "Arena / Garden",
@@ -120,30 +123,30 @@ export const eventsData = [
     {
         title: "Sargam",
         slug: "solo-singing",
-        category: "Solo Singing",
+        category: "Singing (Solo)",
         price: 150,
         image: "/images/event/9.jpg",
         description: "Melodious solo performances.",
-        venue: "Secondary Stage / Arena",
+        venue: "Secondary stage / arena",
         time: "TBA",
         rules: []
     },
     {
         title: "Raftaar",
         slug: "rap-battle",
-        category: "Rap Battle",
+        category: "Singing (Solo)",
         price: 150,
         image: "/images/event/20.jpg",
         description: "Rap battle.",
-        venue: "Secondary Stage / Arena",
+        venue: "Secondary stage / arena",
         time: "TBA",
         rules: []
     },
     {
         title: "Swarsangam",
         slug: "band-war",
-        category: "Band War",
-        price: 600, // 200 per person * 3 (min)
+        category: "Singing (Group)",
+        price: 600, // Min 3 * 200
         image: "/images/event/10.jpg",
         description: "Battle of the bands.",
         venue: "Main Stage",
@@ -154,10 +157,10 @@ export const eventsData = [
         maxSize: 8
     },
     {
-        title: "Bawaal", // Nukkad
+        title: "Bawaal (Nukkad)",
         slug: "nukkad",
-        category: "Nukkad",
-        price: 0,
+        category: "Dramatics (Group)",
+        price: 1000,
         image: "/images/event/19.jpg",
         description: "Street play competition.",
         venue: "Arena",
@@ -168,77 +171,88 @@ export const eventsData = [
         maxSize: 20
     },
     {
-        title: "Ekanki", // Monoact
+        title: "Ekanki (Monoact)",
         slug: "monoact",
-        category: "Monoact",
-        price: 0, // Blank in itinerary
+        category: "Dramatics (Solo)",
+        price: 250,
         image: "/images/event/13.jpg",
         description: "Solo theatrical performance.",
-        venue: "Secondary Stage / Arena",
+        venue: "Auditorium",
         time: "TBA",
         rules: []
     },
     {
-        title: "Skit",
+        title: "Tamasha (Skit)",
         slug: "skit",
-        category: "Skit",
-        price: 0, // Blank
-        image: "/images/event/19.jpg", // Placeholder (using Nukkad)
+        category: "Dramatics (Group)",
+        price: 500,
+        image: "/images/event/skit.png",
         description: "Group skit performance.",
-        venue: "Main Stage / Auditorium / Secondary Stage",
+        venue: "Auditorium",
         time: "TBA",
         rules: [],
         isTeam: true,
         minSize: 3,
-        maxSize: 8
+        maxSize: 10
     },
     {
         title: "Mime",
         slug: "mime",
-        category: "Mime",
-        price: 0, // Blank
-        image: "/images/event/21.jpg", // Placeholder (using Mimicry)
+        category: "Dramatics (Group/ Solo)",
+        price: 400,
+        image: "/images/event/mime.png",
         description: "Silent acting.",
-        venue: "Secondary Stage / Auditorium",
+        venue: "Auditorium",
         time: "TBA",
         rules: [],
-        isTeam: true, // Group/Solo. Can be both. Let's allow team.
+        isTeam: true,
         minSize: 1,
-        maxSize: 6
+        maxSize: 8
     },
     {
-        title: "Kirdaar", // Mimicry
+        title: "Kirdaar",
         slug: "mimicry",
-        category: "Mimicry",
-        price: 0, // Blank
+        category: "Dramatics",
+        price: 200,
         image: "/images/event/21.jpg",
         description: "Imitate and entertain.",
-        venue: "Secondary Stage / Arena / Auditorium",
+        venue: "Auditorium",
+        time: "TBA",
+        rules: []
+    },
+    {
+        title: "Cosplay",
+        slug: "cosplay",
+        category: "Dramatics",
+        price: 300,
+        image: "/images/event/26.jpg",
+        description: "Dress up as your favorite character.",
+        venue: "Auditorium / arena",
         time: "TBA",
         rules: []
     },
     {
         title: "Marketing Mania",
         slug: "marketing-mania",
-        category: "Business",
-        price: 120, // 40 per person * 3. Itinerary says 40 per person.
+        category: "E-cell (Group)",
+        price: 120, // 3 * 40
         image: "/images/event/4.jpg",
         description: "Sell your ideas to the sharks.",
-        venue: "Kalam Hall / Main Stage / Auditorium / LT-11",
+        venue: "Kalam Hall/ Main stage/ Auditorium/ LT-11",
         time: "TBA",
         rules: [],
         isTeam: true,
-        minSize: 3, // Group
+        minSize: 3,
         maxSize: 5
     },
     {
         title: "Tehkikat",
         slug: "case-study",
-        category: "Case Study",
-        price: 100, // 50 per person * 2
+        category: "E-cell (Group)",
+        price: 100, // 2 * 50
         image: "/images/event/15.jpg",
         description: "Solve real world problems.",
-        venue: "College Campus",
+        venue: "College campus",
         time: "TBA",
         rules: [],
         isTeam: true,
@@ -248,11 +262,11 @@ export const eventsData = [
     {
         title: "Startup Auction",
         slug: "startup-auction",
-        category: "Auction",
-        price: 150, // 50 per person * 3
+        category: "E-cell (Group)",
+        price: 150, // 3* 50
         image: "/images/event/25.jpg",
         description: "IPL style auction for Startups.",
-        venue: "Auditorium / Main Stage",
+        venue: "Auditorium/ Main stage",
         time: "TBA",
         rules: [],
         isTeam: true,
@@ -262,13 +276,127 @@ export const eventsData = [
     {
         title: "Startup Conclave",
         slug: "startup-conclave",
-        category: "Business",
-        price: 0, // Entry free if registered in other E-cell event. We can handle logic or just set 0.
-        image: "/images/event/4.jpg", // Placeholder (using Marketing)
+        category: "E-cell (Group)",
+        price: 0,
+        image: "/images/event/4.jpg",
         description: "Networking and insights from industry leaders.",
         venue: "Auditorium",
         time: "TBA",
         rules: ["Entry free for participants registered in any other E-Cell event."]
+    },
+    {
+        title: "Essay Writing",
+        slug: "essay-writing",
+        category: "Literary (Solo)",
+        price: 100,
+        image: "/images/event/essay.jpg",
+        description: "Pen down your thoughts.",
+        venue: "Kalam Hall",
+        time: "TBA",
+        rules: []
+    },
+    {
+        title: "Afsane (Twist a tale)",
+        slug: "twist-a-tale",
+        category: "Literary (Individual / pair)",
+        price: 100,
+        image: "/images/event/27.jpg",
+        description: "Story writing with a twist.",
+        venue: "Kalam Hall",
+        time: "TBA",
+        rules: [],
+        isTeam: true,
+        minSize: 1,
+        maxSize: 2
+    },
+    {
+        title: "Roobaroo (Debate)",
+        slug: "debate",
+        category: "Literary (Group)",
+        price: 200, // 2 * 100 assumed group size
+        image: "/images/event/7.jpg",
+        description: "Voice your opinion.",
+        venue: "Kalam Hall / Conference Hall",
+        time: "TBA",
+        rules: [],
+        isTeam: true,
+        minSize: 2,
+        maxSize: 2
+    },
+    {
+        title: "Jumla (JAM)",
+        slug: "jam",
+        category: "Literary (Solo)",
+        price: 100,
+        image: "/images/event/29.jpg",
+        description: "Just a Minute.",
+        venue: "Auditorium",
+        time: "TBA",
+        rules: []
+    },
+    {
+        title: "Rangmanch (Open stage)",
+        slug: "open-stage",
+        category: "Literary (Solo/ Group)",
+        price: 100,
+        image: "/images/event/8.jpg",
+        description: "The stage is yours.",
+        venue: "Auditorium",
+        time: "TBA",
+        rules: [],
+        isTeam: true,
+        minSize: 1,
+        maxSize: 5
+    },
+    {
+        title: "Lit Quiz",
+        slug: "lit-quiz",
+        category: "Literary (Group)",
+        price: 200, // 2 * 100
+        image: "/images/event/quiz.jpg",
+        description: "Test your literary knowledge.",
+        venue: "Kalam Hall",
+        time: "TBA",
+        rules: [],
+        isTeam: true,
+        minSize: 2,
+        maxSize: 3
+    },
+    {
+        title: "Open Stage Poetry",
+        slug: "poetry",
+        category: "Literary (Solo)",
+        price: 100,
+        image: "/images/event/poetry.jpg",
+        description: "Express with verses.",
+        venue: "Auditorium",
+        time: "TBA",
+        rules: []
+    },
+    {
+        title: "Tasveeron Kee Dastan",
+        slug: "picture-story",
+        category: "Mirage (Solo)",
+        price: 100,
+        image: "/images/event/5.jpg",
+        description: "Weave a story through a series of pictures.",
+        venue: "Kalam Hall / Centre stage / Auditorium / LT11",
+        time: "TBA",
+        rules: []
+    },
+    {
+        title: "Safarnama (Short Film)",
+        slug: "short-film",
+        category: "Mirage (Group)",
+        price: 250,
+        image: "/images/event/24.jpg",
+        description: "Short film making.",
+        venue: "Kalam Hall / Centre stage / Auditorium / LT11",
+        time: "TBA",
+        rules: [],
+        isTeam: true,
+        minSize: 2,
+        maxSize: 10
     },
     {
         title: "Treasure Hunt",
@@ -285,45 +413,12 @@ export const eventsData = [
         maxSize: 5
     },
     {
-        title: "Tasveeron ki dastan",
-        slug: "picture-story",
-        category: "Picture Story",
-        price: 100,
-        image: "/images/event/5.jpg",
-        description: "Weave a story through a series of pictures.",
-        venue: "Campus",
-        time: "TBA",
-        rules: []
-    },
-    {
         title: "One to One Battle",
         slug: "dance-battle",
         category: "Dance",
         price: 250,
         image: "/images/event/6.jpg",
         description: "Face off in an epic dance battle.",
-        venue: "Main Stage",
-        time: "TBA",
-        rules: []
-    },
-    {
-        title: "Roobaroo",
-        slug: "debate",
-        category: "Debate",
-        price: 150,
-        image: "/images/event/7.jpg",
-        description: "Voice your opinion.",
-        venue: "LT / Hall",
-        time: "TBA",
-        rules: []
-    },
-    {
-        title: "Rangmanch",
-        slug: "open-stage",
-        category: "Open Stage",
-        price: 200,
-        image: "/images/event/8.jpg",
-        description: "The stage is yours.",
         venue: "Main Stage",
         time: "TBA",
         rules: []
@@ -362,25 +457,11 @@ export const eventsData = [
         rules: []
     },
     {
-        title: "Safarnama",
-        slug: "short-film",
-        category: "Short Film",
-        price: 300,
-        image: "/images/event/24.jpg",
-        description: "Short film making.",
-        venue: "Online",
-        time: "TBA",
-        rules: [],
-        isTeam: true,
-        minSize: 2,
-        maxSize: 10
-    },
-    {
         title: "Model United Nations",
         slug: "mun",
         category: "MUN",
         price: 500,
-        image: "/images/event/26.jpg",
+        image: "/images/event/mun.png",
         description: "Mock UN session.",
         venue: "Conference Hall",
         time: "TBA",
@@ -388,27 +469,5 @@ export const eventsData = [
         isTeam: true,
         minSize: 1,
         maxSize: 2
-    },
-    {
-        title: "Afsane",
-        slug: "twist-a-tale",
-        category: "Twist a Tale",
-        price: 150,
-        image: "/images/event/27.jpg",
-        description: "Story writing with a twist.",
-        venue: "Classroom",
-        time: "TBA",
-        rules: []
-    },
-    {
-        title: "Jumla",
-        slug: "jam",
-        category: "JAM",
-        price: 150,
-        image: "/images/event/29.jpg",
-        description: "Just a Minute.",
-        venue: "Classroom",
-        time: "TBA",
-        rules: []
     }
 ];

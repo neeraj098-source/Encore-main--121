@@ -43,22 +43,7 @@ export default function LoginForm() {
         accommodation: ''
     });
 
-    const handleDevFill = () => {
-        const randomStr = Math.random().toString(36).substring(7);
-        setFormData({
-            name: "Dev User",
-            email: `dev${randomStr}@example.com`,
-            phone: "9876543210",
-            gender: "Male",
-            referralCode: "",
-            password: "password123",
-            confirmPassword: "password123",
-            college: "IET Lucknow",
-            year: "2",
-            course: "B.Tech",
-            accommodation: "no"
-        });
-    };
+
 
     // Login Data
     const [loginData, setLoginData] = useState({
@@ -353,14 +338,7 @@ export default function LoginForm() {
                         {step === 1 && (
                             <form onSubmit={(e) => { e.preventDefault(); handleNext(); }} className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
                                 {/* Dev Autofill Button (Top Right of Form) */}
-                                <button
-                                    type="button"
-                                    onClick={handleDevFill}
-                                    className="absolute -top-10 right-0 text-xs bg-white/10 hover:bg-gold/20 text-gold/50 hover:text-gold px-2 py-1 rounded transition-colors"
-                                    title="Auto-fill with dummy data"
-                                >
-                                    ⚡ Dev Fill
-                                </button>
+
 
                                 <div className="md:col-span-2 space-y-2">
                                     <label className="text-xs text-gray-400 ml-1">Name*</label>

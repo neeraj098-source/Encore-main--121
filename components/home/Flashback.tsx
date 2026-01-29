@@ -13,6 +13,13 @@ const galleryImages = [
     '/images/i1.jpg',
 ];
 
+const legacyImages = [
+    '/images/legacy/1.jpg',
+    '/images/legacy/2.jpg',
+    '/images/legacy/3.jpg',
+    '/images/legacy/4.png',
+];
+
 export default function Flashback() {
     const containerRef = useRef<HTMLDivElement>(null);
     const { scrollYProgress } = useScroll({
@@ -72,7 +79,7 @@ export default function Flashback() {
 
                 {/* Row 2 */}
                 <motion.div style={{ x: x2 }} className="flex gap-4 whitespace-nowrap">
-                    {[...galleryImages, ...galleryImages].reverse().map((src, i) => (
+                    {[...legacyImages, ...legacyImages].reverse().map((src, i) => (
                         <div key={`row2-${i}`} className="relative w-[300px] h-[200px] md:w-[500px] md:h-[300px] flex-shrink-0 rounded-lg overflow-hidden border border-white/10 group">
                             <Image
                                 src={src}

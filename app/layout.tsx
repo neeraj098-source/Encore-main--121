@@ -19,8 +19,27 @@ const marcellus = Marcellus({
 });
 
 export const metadata: Metadata = {
-  title: "Encore 26 | Nawabi Elegance",
+  title: "Encore 26",
   description: "The Annual Cultural Fest of IET Lucknow",
+  icons: {
+    icon: "/images/iet_logo_new.png",
+    shortcut: "/images/iet_logo_new.png",
+    apple: "/images/iet_logo_new.png",
+  },
+  openGraph: {
+    title: "Encore 26",
+    description: "The Annual Cultural Fest of IET Lucknow",
+    siteName: "Encore 26",
+    images: [
+      {
+        url: "/images/iet_logo_new.png",
+        width: 800,
+        height: 800,
+        alt: "IET Lucknow Logo",
+      },
+    ],
+    type: "website",
+  },
 };
 
 export default function RootLayout({

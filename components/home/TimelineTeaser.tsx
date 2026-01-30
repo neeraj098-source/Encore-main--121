@@ -1,42 +1,9 @@
 "use client";
 
-import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
+import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
 
 export default function TimelineTeaser() {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const firstNodeRef = useRef<HTMLDivElement>(null);
-    const lastNodeRef = useRef<HTMLDivElement>(null);
-    const [lineStyle, setLineStyle] = useState({ top: 0, height: 0 });
-
-    // Measure positions to align the line exactly center-to-center
-    useEffect(() => {
-        const updatePosition = () => {
-            if (containerRef.current && firstNodeRef.current && lastNodeRef.current) {
-                const containerRect = containerRef.current.getBoundingClientRect();
-                const firstRect = firstNodeRef.current.getBoundingClientRect();
-                const lastRect = lastNodeRef.current.getBoundingClientRect();
-
-                const top = firstRect.top - containerRect.top + (firstRect.height / 2);
-                const bottom = lastRect.top - containerRect.top + (lastRect.height / 2);
-                const height = bottom - top;
-
-                setLineStyle({ top, height });
-            }
-        };
-
-        updatePosition();
-        window.addEventListener('resize', updatePosition);
-        return () => window.removeEventListener('resize', updatePosition);
-    }, []);
-
-    // Scroll progress for the drawing animation
-    // We target the container but adjust offsets to match the line's visual start
-    const { scrollYProgress } = useScroll({
-        target: containerRef,
-        offset: ["start 70%", "end 50%"] // Starts drawing a bit earlier
-    });
-
     const events = [
         {
             day: "DAY 01",
@@ -61,114 +28,129 @@ export default function TimelineTeaser() {
         },
     ];
 
+    const containerRef = useRef<HTMLDivElement>(null);
+    const firstCircleRef = useRef<HTMLDivElement>(null);
+    const lastCircleRef = useRef<HTMLDivElement>(null);
+    const [lineStyle, setLineStyle] = useState({ top: 0, height: 0 });
+
+    const { scrollYProgress } = useScroll({
+        target: containerRef,
+        offset: ["start 65%", "end 50%"]
+    });
+
+    const scaleY = useSpring(scrollYProgress, {
+        stiffness: 100,
+        damping: 30,
+        restDelta: 0.001
+    });
+
+    useEffect(() => {
+        const updateLine = () => {
+            if (containerRef.current && firstCircleRef.current && lastCircleRef.current) {
+                const containerRect = containerRef.current.getBoundingClientRect();
+                const firstRect = firstCircleRef.current.getBoundingClientRect();
+                const lastRect = lastCircleRef.current.getBoundingClientRect();
+
+                // Calculate relative positions from top of container
+                const top = firstRect.top - containerRect.top + (firstRect.height / 2);
+                const bottom = lastRect.top - containerRect.top + (lastRect.height / 2);
+                const height = bottom - top;
+
+                setLineStyle({ top, height });
+            }
+        };
+
+        // Initial calculation
+        updateLine();
+
+        // Recalculate on resize
+        window.addEventListener('resize', updateLine);
+        // Slightly delayed calculation to ensure layout is settled
+        const timer = setTimeout(updateLine, 100);
+
+        return () => {
+            window.removeEventListener('resize', updateLine);
+            clearTimeout(timer);
+        };
+    }, []);
+
     return (
-        <section className="relative bg-[#0a0a0a] min-h-screen py-32 overflow-hidden flex flex-col items-center justify-center">
+        <section className="relative min-h-screen py-32 overflow-hidden flex flex-col items-center justify-center">
 
             {/* Background Texture & Elements */}
-            <div className="absolute inset-0 opacity-20 pointer-events-none"
-                style={{ backgroundImage: 'url("/images/texture-noise.png")' }}></div>
-
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,215,0,0.03)_0%,transparent_70%)] pointer-events-none" />
-
-            {/* Floating Dust Particles */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                {[...Array(5)].map((_, i) => (
-                    <motion.div
-                        key={i}
-                        className="absolute w-1 h-1 bg-gold rounded-full opacity-20"
-                        animate={{
-                            y: [-20, -100],
-                            x: Math.random() * 100 - 50,
-                            opacity: [0, 0.5, 0]
-                        }}
-                        transition={{
-                            duration: 5 + Math.random() * 5,
-                            repeat: Infinity,
-                            ease: "linear",
-                            delay: Math.random() * 5
-                        }}
-                        style={{
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`
-                        }}
-                    />
-                ))}
-            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none" />
 
             {/* Section Header */}
-            <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1 }}
-                viewport={{ once: true }}
-                className="text-center mb-20 md:mb-32 relative z-10"
-            >
+            <div className="text-center mb-20 md:mb-32 relative z-10">
                 <div className="inline-block relative">
-                    <span className="text-gold font-marcellus text-sm tracking-[0.5em] uppercase block mb-4">The Journey Begins</span>
-                    <h2 className="text-5xl md:text-7xl font-cinzel text-transparent bg-clip-text bg-gradient-to-b from-white via-amber-100 to-amber-900 filter drop-shadow-lg">
+                    <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-[1px] h-20 bg-gradient-to-b from-transparent to-[#D4AF37] opacity-60" />
+                    <span className="text-[#D4AF37] font-marcellus text-sm tracking-[0.5em] uppercase block mb-6 drop-shadow-md">The Journey Begins</span>
+                    <h2 className="text-6xl md:text-8xl font-cinzel text-transparent bg-clip-text bg-gradient-to-b from-[#fff] via-[#ffe0b2] to-[#d4af37] filter drop-shadow-[0_2px_10px_rgba(212,175,55,0.4)]">
                         ROYAL CHRONICLE
                     </h2>
                 </div>
-            </motion.div>
+            </div>
 
             {/* Timeline Container */}
             <div ref={containerRef} className="relative w-full max-w-6xl mx-auto px-6 md:px-12 flex flex-col gap-24 md:gap-32">
 
-                {/* Central Line - Positioned precisely via JS */}
+                {/* Base Line (Faint Background) - strictly between circles */}
                 <div
-                    className="absolute left-4 md:left-1/2 w-[2px] bg-white/5 -translate-x-1/2 md:translate-x-0"
-                    style={{ top: lineStyle.top, height: lineStyle.height }}
-                >
-                    {/* The drawing line */}
-                    <motion.div
-                        className="w-full h-full bg-[#FFD700] origin-top"
-                        style={{ scaleY: scrollYProgress }}
-                    />
-                </div>
+                    className="absolute left-4 md:left-1/2 w-[1px] bg-[#D4AF37]/10 -translate-x-1/2 md:translate-x-0"
+                    style={{
+                        top: lineStyle.top,
+                        height: lineStyle.height
+                    }}
+                />
+
+                {/* Animated Line (Bright Gold) */}
+                <motion.div
+                    className="absolute left-4 md:left-1/2 w-[2px] bg-gradient-to-b from-[#FFD700] via-[#FDB931] to-[#FFD700] -translate-x-1/2 md:translate-x-0 origin-top shadow-[0_0_15px_rgba(255,215,0,0.6)] z-10"
+                    style={{
+                        top: lineStyle.top,
+                        height: lineStyle.height,
+                        scaleY: scaleY
+                    }}
+                />
 
                 {events.map((event, index) => (
-                    <motion.div
+                    <div
                         key={index}
-                        initial={{ opacity: 0, x: event.align === 'left' ? -50 : 50 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.8, delay: index * 0.2 }}
-                        viewport={{ once: true, margin: "-100px" }}
                         className={`relative flex flex-col md:flex-row items-center w-full ${event.align === 'right' ? 'md:flex-row-reverse' : ''}`}
                     >
                         {/* Content Side */}
                         <div className={`w-full md:w-5/12 pl-12 md:pl-0 ${event.align === 'right' ? 'md:pl-16 text-left' : 'md:pr-16 md:text-right'}`}>
-                            <div className="relative">
+                            <div className="relative group">
                                 {/* Large Day Number */}
-                                <h3 className={`text-6xl md:text-8xl font-cinzel text-white/5 md:text-white/5 absolute -top-10 md:-top-16 ${event.align === 'right' ? 'left-0' : 'right-0 md:right-0 left-0 md:left-auto'} select-none z-0`}>
+                                <h3 className={`text-7xl md:text-9xl font-cinzel text-[#ffffff]/[0.03] absolute -top-12 md:-top-20 ${event.align === 'right' ? 'left-0' : 'right-0 md:right-0 left-0 md:left-auto'} select-none z-0 transition-colors duration-700 group-hover:text-[#D4AF37]/10`}>
                                     {event.day}
                                 </h3>
 
-                                <div className="relative z-10">
-                                    <h4 className="text-gold font-marcellus text-lg tracking-[0.2em] mb-2">{event.date}</h4>
-                                    <h3 className="text-3xl md:text-5xl font-cinzel text-white mb-4 leading-tight">{event.title}</h3>
-                                    <p className="text-gray-400 font-marcellus text-lg md:text-xl tracking-wide border-l-2 md:border-l-0 md:border-r-0 border-gold/30 pl-4 md:pl-0">
+                                <div className="relative z-10 border-l-2 md:border-l-0 md:border-none pl-6 md:pl-0 border-[#D4AF37]/50">
+                                    <h4 className="text-[#FFD700] font-marcellus text-xl tracking-[0.2em] mb-3 drop-shadow-sm">{event.date}</h4>
+                                    <h3 className="text-4xl md:text-6xl font-cinzel text-white mb-4 leading-tight drop-shadow-lg">{event.title}</h3>
+                                    <p className="text-gray-300 font-marcellus text-xl md:text-2xl tracking-wide opacity-80">
                                         {event.description}
                                     </p>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Central Node */}
+                        {/* Central Node - Static */}
                         <div
-                            ref={index === 0 ? firstNodeRef : index === events.length - 1 ? lastNodeRef : null}
-                            className="absolute left-4 md:left-1/2 -translate-x-1/2 w-8 h-8 md:w-12 md:h-12 flex items-center justify-center z-20"
+                            ref={index === 0 ? firstCircleRef : index === events.length - 1 ? lastCircleRef : null}
+                            className="absolute left-4 md:left-1/2 -translate-x-1/2 w-8 h-8 md:w-16 md:h-16 flex items-center justify-center z-20"
                         >
-                            <div className="w-3 h-3 md:w-4 md:h-4 bg-gold rounded-full shadow-[0_0_15px_#FFD700] animate-pulse" />
-                            <div className="absolute inset-0 border border-gold/40 rounded-full scale-110" />
-                            <div className="absolute inset-0 border border-gold/20 rounded-full scale-150 animate-ping-slow" />
+                            <div className="w-3 h-3 md:w-5 md:h-5 bg-[#FFD700] rounded-full shadow-[0_0_20px_#FFD700] relative z-10" />
+                            <div className="absolute inset-0 border border-[#D4AF37]/40 rounded-full scale-110" />
                         </div>
                         <div className="w-full md:w-5/12 hidden md:block" />
-                    </motion.div>
+                    </div>
                 ))}
             </div>
 
             {/* Bottom Fade */}
-            <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-black to-transparent pointer-events-none" />
         </section>
     );
 }

@@ -3,8 +3,10 @@ import { Cinzel, Marcellus } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
 import RoyalFooter from "@/components/layout/RoyalFooter";
 import Loader from "@/components/ui/Loader";
-import CornerCurtains from "@/components/ui/CornerCurtains";
 import Particles from "@/components/ui/Particles";
+import CinematicBackground from "@/components/ui/CinematicBackground";
+import CinematicLightingOverlay from "@/components/ui/CinematicLightingOverlay";
+import CornerCurtains from "@/components/ui/CornerCurtains";
 import "./globals.css";
 
 const cinzel = Cinzel({
@@ -54,36 +56,15 @@ export default function RootLayout({
         className={`${cinzel.variable} ${marcellus.variable} antialiased bg-black min-h-screen text-white overflow-x-hidden selection:bg-gold/30`}
       >
         {/* Cinematic Background Layer System */}
-        <div className="fixed inset-0 z-[-1]">
-          {/* Layer 1: Deep Charcoal Gradient Base */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-black to-black" />
+        <CinematicBackground />
+        <CinematicLightingOverlay />
+        <CornerCurtains />
 
-          {/* Layer 2: Mughal Manuscript Texture (Low Opacity) */}
-          <div
-            className="absolute inset-0 opacity-[0.15] bg-cover bg-center mix-blend-overlay"
-            style={{ backgroundImage: 'url("/images/backgrounds/royal-texture.png")' }}
-          />
-
-          {/* Layer 3: Floating Golden Dust Particles (Canvas) */}
-          <div className="absolute inset-0 opacity-60">
-            <Particles
-              className="absolute inset-0"
-              quantity={40}
-              staticity={20}
-              ease={50}
-              refresh={false}
-              color="#FFD700"
-            />
-          </div>
-
-          {/* Layer 4: Soft Vignette & Warm Glow */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)]" />
-        </div>
+        {/* Previous background elements removed in favor of the unified component */}
 
         <Loader />
-        <CornerCurtains />
         <Navbar />
-        <main className="relative z-10">
+        <main className="relative pt-36">
           {children}
         </main>
         <RoyalFooter />

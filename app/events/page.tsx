@@ -37,7 +37,7 @@ export default function EventsPage() {
     };
 
     return (
-        <main className="min-h-screen bg-black pt-24 px-4 pb-12">
+        <main className="min-h-screen bg-black pt-36 px-4 pb-12">
             <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
             <div className="max-w-7xl mx-auto">
                 <motion.h1

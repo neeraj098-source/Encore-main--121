@@ -56,10 +56,10 @@ export async function PUT(request: Request) {
 
         // Handle Password Reset
         if (password && password.trim() !== "") {
-            console.log("Admin: Resetting password for user", userId);
+
             const hashedPassword = await bcrypt.hash(password, 10);
             data.password = hashedPassword;
-            console.log("Admin: Password hashed successfully");
+
         }
 
         const updatedUser = await prisma.user.update({

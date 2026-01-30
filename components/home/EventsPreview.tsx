@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -35,45 +34,52 @@ export default function EventsPreview() {
     ];
 
     return (
-        <section className="bg-black py-20 relative px-4 text-white">
-            {/* Decorative Background Pattern */}
-            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,215,0,0.15) 1px, transparent 0)', backgroundSize: '40px 40px' }}></div>
+        <section className="relative py-24 px-4 text-white overflow-hidden">
+            {/* Decorative Background Pattern - Mughal Jaali Effect */}
+            <div className="absolute inset-0 opacity-[0.03]"
+                style={{
+                    backgroundImage: 'radial-gradient(circle at 2px 2px, #D4AF37 1px, transparent 0)',
+                    backgroundSize: '24px 24px'
+                }}>
+            </div>
 
-            <div className="max-w-7xl mx-auto">
-                <div className="flex justify-between items-end mb-12">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#D4AF37]/5 to-transparent pointer-events-none" />
+
+            <div className="max-w-7xl mx-auto relative z-10">
+                <div className="flex flex-col md:flex-row justify-between items-end mb-16 border-b border-[#D4AF37]/20 pb-6">
                     <div>
-                        <h2 className="text-4xl font-cinzel text-white mb-2">EXPLORE CATEGORIES</h2>
-                        <div className="h-1 w-24 bg-gold rounded-full" />
+                        <h2 className="text-4xl md:text-6xl font-cinzel text-white mb-2 tracking-tight">EXPLORE CATEGORIES</h2>
+                        <div className="h-1 w-32 bg-[#D4AF37] shadow-[0_0_10px_#D4AF37]" />
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {categories.map((cat, index) => (
                         <Link href={cat.link} key={index}>
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.1 }}
-                                viewport={{ once: true }}
-                                className={`relative h-80 rounded-xl overflow-hidden group cursor-pointer border border-white/10 hover:border-gold/50 transition-colors`}
+                            <div
+                                className={`relative h-96 rounded-t-3xl border border-[#D4AF37]/20 overflow-hidden group cursor-pointer hover:border-[#D4AF37] transition-colors duration-500 bg-black/40 backdrop-blur-sm`}
                             >
                                 <Image
                                     src={cat.image}
                                     alt={cat.name}
                                     fill
-                                    className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100"
+                                    className="object-cover transition-transform duration-1000 group-hover:scale-110 opacity-60 group-hover:opacity-100"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-90 transition-opacity duration-300" />
 
-                                <div className="absolute inset-0 p-6 flex flex-col justify-end">
-                                    <h3 className="text-2xl font-cinzel text-white mb-1 group-hover:text-gold transition-colors translate-y-2 group-hover:translate-y-0 duration-300">{cat.name}</h3>
-                                    <p className="text-gray-300 text-sm font-marcellus mb-4 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-4 group-hover:translate-y-0">{cat.description}</p>
+                                {/* Inner Border Frame */}
+                                <div className="absolute inset-3 border border-[#D4AF37]/10 rounded-t-2xl pointer-events-none group-hover:border-[#D4AF37]/40 transition-colors duration-500" />
 
-                                    <div className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center bg-black/30 backdrop-blur-sm group-hover:bg-gold group-hover:border-gold group-hover:text-black transition-all duration-300">
-                                        <ArrowRight size={16} />
+                                <div className="absolute inset-0 p-8 flex flex-col justify-end">
+                                    <h3 className="text-3xl font-cinzel text-white mb-1 group-hover:text-[#FFD700] transition-colors translate-y-2 group-hover:translate-y-0 duration-500 drop-shadow-md">{cat.name}</h3>
+                                    <div className="h-[1px] w-0 group-hover:w-full bg-[#FFD700] transition-all duration-700 mb-2 opacity-50" />
+                                    <p className="text-[#e0e0e0] text-sm font-marcellus mb-6 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0 tracking-wide">{cat.description}</p>
+
+                                    <div className="absolute top-4 right-4 w-12 h-12 rounded-full border border-[#D4AF37]/30 flex items-center justify-center bg-black/50 backdrop-blur-md group-hover:bg-[#D4AF37] group-hover:text-black transition-all duration-300">
+                                        <ArrowRight size={20} />
                                     </div>
                                 </div>
-                            </motion.div>
+                            </div>
                         </Link>
                     ))}
                 </div>

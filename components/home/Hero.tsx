@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import Image from 'next/image';
-import Particles from '@/components/ui/Particles';
+
 
 export default function Hero() {
     const [isLoggedIn] = useState(() => {
@@ -22,24 +22,6 @@ export default function Hero() {
         }
         return { text: 2, gate: 2.6 };
     });
-
-    // Removed useEffect for delays/auth as they are now lazy initialized
-
-    // Animation Variants
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const textVariant: any = {
-        hidden: { opacity: 0, scale: 0.9, y: 20 },
-        visible: {
-            opacity: 1,
-            scale: 1,
-            y: 0,
-            transition: {
-                duration: 0.6,
-                ease: "easeInOut",
-                delay: delays.text // Wait for curtains (Loader) to start opening (2.5s)
-            }
-        }
-    };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const leftGateVariant: any = {
@@ -70,82 +52,93 @@ export default function Hero() {
     };
 
     return (
-        <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-black">
-            {/* Pure Black Background - Video Removed */}
+        <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
+            {/* Global Background is visible, no local bg-black */}
 
             {/* --- Decorative Architectural Images (Rumi Darwaza Halves) --- */}
 
-            {/* Left Half - Bottom Left */}
+            {/* Left Half - Bottom Left - Enhanced Size/Position */}
             <motion.div
                 variants={leftGateVariant}
                 initial="hidden"
                 animate="visible"
-                className="absolute bottom-0 left-0 w-[50vw] h-[35vh] md:w-[35vw] md:h-[65vh] z-10 pointer-events-none"
+                className="absolute bottom-0 left-0 w-[45vw] h-[40vh] md:w-[35vw] md:h-[75vh] z-[1] pointer-events-none opacity-90 mix-blend-lighten"
+                style={{
+                    maskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to top, black 80%, transparent 100%)',
+                    WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to top, black 80%, transparent 100%)',
+                    maskComposite: 'intersect',
+                    WebkitMaskComposite: 'source-in'
+                }}
             >
                 <div className="relative w-full h-full">
                     <Image
-                        src="/images/roomi_right.png"
+                        src="/images/roomi_gate_left_new.png"
                         alt="Roomi Left"
                         fill
-                        className="object-contain object-bottom md:object-left-bottom"
+                        className="object-contain object-bottom md:object-left-bottom drop-shadow-[0_0_35px_rgba(212,175,55,0.25)] filter brightness-110"
                         priority
                     />
                 </div>
             </motion.div>
 
-            {/* Right Half - Bottom Right */}
+            {/* Right Half - Bottom Right - Enhanced Size/Position */}
             <motion.div
                 variants={rightGateVariant}
                 initial="hidden"
                 animate="visible"
-                className="absolute bottom-0 right-0 w-[50vw] h-[35vh] md:w-[35vw] md:h-[65vh] z-10 pointer-events-none"
+                className="absolute bottom-0 right-0 w-[45vw] h-[40vh] md:w-[35vw] md:h-[75vh] z-[1] pointer-events-none opacity-90 mix-blend-lighten"
+                style={{
+                    maskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to top, black 80%, transparent 100%)',
+                    WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to top, black 80%, transparent 100%)',
+                    maskComposite: 'intersect',
+                    WebkitMaskComposite: 'source-in'
+                }}
             >
                 <div className="relative w-full h-full">
                     <Image
-                        src="/images/roomi_left.png"
+                        src="/images/roomi_gate_right_new.png"
                         alt="Roomi Right"
                         fill
-                        className="object-contain object-bottom md:object-right-bottom"
+                        className="object-contain object-bottom md:object-right-bottom drop-shadow-[0_0_35px_rgba(212,175,55,0.25)] filter brightness-110"
                         priority
                     />
                 </div>
             </motion.div>
 
-
             {/* --- Main Content (High Z-Index) --- */}
-            <motion.div
-                className="relative z-20 text-center px-4 max-w-5xl mx-auto"
-                variants={textVariant}
-                initial="hidden"
-                animate="visible"
+            <div
+                className="relative z-20 text-center px-4 max-w-6xl mx-auto flex flex-col items-center justify-center"
             >
-                <p className="text-gold font-marcellus text-sm md:text-lg tracking-[0.3em] mb-6 uppercase">
+                {/* Text Vignette - subtle blending layer */}
+                <div className="absolute inset-0 bg-radial-gradient from-black/0 via-black/0 to-black/40 blur-3xl -z-10 scale-150" />
+
+                <p className="text-[#D4AF37] font-marcellus text-sm md:text-xl tracking-[0.4em] mb-8 uppercase drop-shadow-md">
                     The Annual Cultural Fest of IET Lucknow
                 </p>
 
-                <h1 className="text-6xl md:text-9xl font-cinzel text-white mb-4 tracking-tight relative">
+                <h1 className="text-7xl md:text-[9rem] font-cinzel text-transparent bg-clip-text bg-gradient-to-b from-[#ffecb3] via-[#ffffff] to-[#d4af37] mb-6 tracking-tight relative filter drop-shadow-[0_2px_10px_rgba(212,175,55,0.3)]">
                     ENCORE
-                    <span className="absolute -top-4 -right-6 md:-top-8 md:-right-12 text-2xl md:text-4xl text-gold font-script rotate-12">26</span>
+                    <span className="absolute -top-4 -right-4 md:-top-8 md:-right-12 text-3xl md:text-5xl text-[#FFD700] font-script rotate-12 drop-shadow-[0_0_10px_rgba(255,215,0,0.8)]">26</span>
                 </h1>
 
 
-                <h2 className="text-xl md:text-3xl font-cinzel text-gray-400 tracking-[0.2em] mb-8 md:mb-12">
+                <h2 className="text-2xl md:text-4xl font-cinzel text-gray-300 tracking-[0.3em] mb-12 md:mb-16 border-t border-b border-[#D4AF37]/30 py-4 max-w-3xl mx-auto">
                     NAWABI ELEGANCE
                 </h2>
 
-                <div className="flex flex-col md:flex-row gap-6 justify-center items-center">
+                <div className="flex flex-col md:flex-row gap-8 justify-center items-center">
                     <Link href={isLoggedIn ? "/dashboard" : "/login"}>
-                        <Button size="lg" className="w-48 text-lg bg-gold text-black border-gold hover:bg-gold/90 transition-all duration-300">
+                        <Button size="lg" className="w-56 h-14 text-xl bg-[#D4AF37] text-black border border-[#D4AF37] hover:bg-[#FFD700] hover:scale-105 hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all duration-300 font-cinzel font-bold">
                             {isLoggedIn ? "Dashboard" : "Register Now"}
                         </Button>
                     </Link>
                     <Link href="/events">
-                        <Button variant="outline" size="lg" className="w-48 text-lg border-white/20 text-white hover:bg-white/10 transition-all duration-300">
+                        <Button variant="outline" size="lg" className="w-56 h-14 text-xl border-[#D4AF37]/50 text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:border-[#D4AF37] hover:shadow-[0_0_15px_rgba(212,175,55,0.2)] transition-all duration-300 font-cinzel">
                             Explore Events
                         </Button>
                     </Link>
                 </div>
-            </motion.div>
+            </div>
         </section >
     );
 }

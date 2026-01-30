@@ -4,21 +4,17 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/Button';
 import { Menu, X, ShoppingCart, User } from 'lucide-react';
 import CartDrawer from '@/components/cart/CartDrawer';
-import TopBar from '@/components/layout/TopBar';
 
 export default function Navbar() {
-    const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const { scrollY } = useScroll();
-
     const [cartCount, setCartCount] = useState(0);
     const [isCartOpen, setIsCartOpen] = useState(false);
+    const pathname = usePathname();
 
+    // Functional State Only (No Visual/Scroll State)
     const updateCartCount = async () => {
         try {
             const res = await fetch('/api/cart');
@@ -52,201 +48,123 @@ export default function Navbar() {
         };
     }, []);
 
-    useMotionValueEvent(scrollY, "change", (latest) => {
-        setIsScrolled(latest > 50);
-    });
-
-    const pathname = usePathname();
-
     if (pathname?.startsWith('/admin')) return null;
 
-    const leftLinks = [
+    const navLinks = [
         { name: 'Home', href: '/' },
         { name: 'Events', href: '/events' },
-    ];
-
-    const rightLinks = [
         { name: 'Sponsors', href: '/sponsorship' },
         { name: 'About', href: '/about' },
     ];
 
     return (
         <>
-            <motion.header
-                className={`fixed top-0 left-0 w-full z-50 transition-all duration-500`}
-                initial={{ y: -100 }}
-                animate={{ y: 0 }}
-                transition={{ duration: 0.6, ease: "circOut" }}
-            >
-                {/* Top Utility Bar (Hides on Scroll) */}
-                <AnimatePresence>
-                    {!isScrolled && <TopBar />}
-                </AnimatePresence>
+            {/* ROYAL FLOATING NAVBAR */}
+            <header className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-5xl">
+                <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
 
-                {/* Main Navbar */}
-                <div
-                    className={`w-full transition-all duration-500 ${isScrolled
-                            ? 'bg-black/80 backdrop-blur-xl border-b border-white/5 py-2'
-                            : 'bg-gradient-to-b from-black/80 to-transparent py-4'
-                        }`}
-                >
-                    <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+                {/* Main Container - Floating Pill */}
+                <div className="relative w-full bg-[#050505] border border-[#D4AF37]/20 shadow-[0_0_20px_rgba(0,0,0,0.9)] px-6 py-3 rounded-full">
 
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 relative flex justify-between items-center">
+                    {/* Inner Gold Frame Border */}
+                    <div className="absolute inset-1 rounded-full border border-[#D4AF37]/10 pointer-events-none" />
 
-                        {/* Mobile Menu Toggle */}
-                        <div className="md:hidden flex items-center z-50">
-                            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-gold">
+                    <div className="flex items-center justify-between relative z-10">
+
+                        {/* LEFT: Menu / Logo on Mobile */}
+                        <div className="flex items-center gap-4">
+                            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden text-[#D4AF37]">
                                 {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
                             </button>
+
+                            {/* Desktop Links (Left Side) */}
+                            <nav className="hidden md:flex items-center gap-8 pl-4">
+                                <Link href="/" className="text-[#E8E1CF] hover:text-[#D4AF37] font-cinzel tracking-wider text-sm transition-colors uppercase">Home</Link>
+                                <Link href="/events" className="text-[#E8E1CF] hover:text-[#D4AF37] font-cinzel tracking-wider text-sm transition-colors uppercase">Events</Link>
+                            </nav>
                         </div>
 
-                        {/* DESKTOP NAVIGATION - LEFT */}
-                        <nav className="hidden md:flex items-center space-x-8">
-                            {leftLinks.map((link) => (
-                                <Link
-                                    key={link.name}
-                                    href={link.href}
-                                    className="relative group px-2 py-1"
-                                >
-                                    <span className="font-marcellus text-sm tracking-[0.2em] text-gray-300 group-hover:text-gold transition-colors uppercase">
-                                        {link.name}
-                                    </span>
-                                    <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-gold group-hover:w-full transition-all duration-300 ease-out" />
-                                </Link>
-                            ))}
-                        </nav>
-
-                        {/* CENTER LOGO */}
-                        <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-                            <Link href="/" className="relative group">
-                                <div className={`relative transition-all duration-500 ${isScrolled ? 'w-12 h-12' : 'w-16 h-16 md:w-20 md:h-20'}`}>
-                                    <div className="absolute inset-0 bg-gold/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-500 opacity-50" />
+                        {/* CENTER: Royal Logo Emblem */}
+                        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                            <Link href="/" className="group block relative">
+                                <div className="relative w-16 h-16 md:w-20 md:h-20 flex items-center justify-center">
+                                    {/* Gold Glow behind logo */}
+                                    <div className="absolute inset-0 bg-[#D4AF37]/20 blur-[20px] rounded-full opacity-50 group-hover:opacity-80 transition-opacity duration-500" />
                                     <Image
                                         src="/images/iet_logo_new.png"
                                         alt="Encore Logo"
-                                        fill
-                                        className="object-contain drop-shadow-[0_0_15px_rgba(255,215,0,0.3)]"
+                                        width={64}
+                                        height={64}
+                                        className="object-contain drop-shadow-[0_2px_10px_rgba(212,175,55,0.5)] z-10 group-hover:scale-105 transition-transform duration-300"
+                                        priority
                                     />
                                 </div>
                             </Link>
                         </div>
 
-                        {/* DESKTOP NAVIGATION - RIGHT */}
-                        <nav className="hidden md:flex items-center space-x-8">
-                            {rightLinks.map((link) => (
-                                <Link
-                                    key={link.name}
-                                    href={link.href}
-                                    className="relative group px-2 py-1"
-                                >
-                                    <span className="font-marcellus text-sm tracking-[0.2em] text-gray-300 group-hover:text-gold transition-colors uppercase">
-                                        {link.name}
-                                    </span>
-                                    <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-gold group-hover:w-full transition-all duration-300 ease-out" />
+                        {/* RIGHT: Actions */}
+                        <div className="flex items-center gap-6 pr-4">
+                            {/* Desktop Links (Right Side) */}
+                            <nav className="hidden md:flex items-center gap-8">
+                                <Link href="/sponsorship" className="text-[#E8E1CF] hover:text-[#D4AF37] font-cinzel tracking-wider text-sm transition-colors uppercase">Sponsors</Link>
+                                <Link href="/about" className="text-[#E8E1CF] hover:text-[#D4AF37] font-cinzel tracking-wider text-sm transition-colors uppercase">About</Link>
+                            </nav>
+
+                            <div className="h-4 w-[1px] bg-[#D4AF37]/30 hidden md:block" />
+
+                            <div className="flex items-center gap-5 text-[#D4AF37]">
+                                <Link href="/ca-portal" className="hidden md:block text-xs font-marcellus tracking-widest hover:text-white transition-colors border-b border-transparent hover:border-[#D4AF37]">
+                                    CA PORTAL
                                 </Link>
-                            ))}
-
-                            <div className="h-4 w-[1px] bg-white/10 mx-2" />
-
-                            {/* Icons Row */}
-                            <div className="flex items-center space-x-4">
-                                <div className="relative group">
-                                    <Link href="/ca-portal">
-                                        <span className="font-marcellus text-[10px] text-gold border border-gold/30 px-2 py-1 rounded hover:bg-gold hover:text-black transition-all cursor-pointer">
-                                            CA PORTAL
-                                        </span>
-                                    </Link>
-                                </div>
-
-                                <button onClick={() => setIsCartOpen(true)} className="text-white/80 hover:text-gold transition-colors relative">
+                                <button onClick={() => setIsCartOpen(true)} className="relative hover:text-white transition-colors">
                                     <ShoppingCart size={18} />
                                     {cartCount > 0 && (
-                                        <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center border border-black font-bold">
-                                            {cartCount}
-                                        </span>
+                                        <span className="absolute -top-1.5 -right-1.5 w-1.5 h-1.5 bg-red-500 rounded-full shadow-[0_0_5px_red]" />
                                     )}
                                 </button>
-
-                                <Link href={isLoggedIn ? "/dashboard" : "/login"}>
-                                    <div className="w-8 h-8 rounded-full bg-white/5 border border-gold/30 flex items-center justify-center text-gold hover:bg-gold hover:text-black transition-all duration-300 cursor-pointer group shadow-[0_0_10px_rgba(255,215,0,0.1)]">
-                                        <User size={14} className="group-hover:scale-110 transition-transform" />
-                                    </div>
+                                <Link href={isLoggedIn ? "/dashboard" : "/login"} className="hover:text-white transition-colors">
+                                    <User size={18} />
                                 </Link>
                             </div>
-                        </nav>
-
-                        {/* Mobile Cart & Profile (Visible on Mobile) */}
-                        <div className="md:hidden flex items-center gap-4">
-                            <button onClick={() => setIsCartOpen(true)} className="text-gold relative">
-                                <ShoppingCart size={20} />
-                                {cartCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[8px] w-3 h-3 rounded-full flex items-center justify-center">
-                                        {cartCount}
-                                    </span>
-                                )}
-                            </button>
-                            <Link href={isLoggedIn ? "/dashboard" : "/login"}>
-                                <div className="w-7 h-7 rounded-full border border-gold/50 flex items-center justify-center text-gold">
-                                    <User size={14} />
-                                </div>
-                            </Link>
                         </div>
 
                     </div>
                 </div>
-            </motion.header>
+            </header>
 
-            {/* Full Screen Mobile Menu Overlay */}
-            <AnimatePresence>
-                {isMobileMenuOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, y: '-100%' }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: '-100%' }}
-                        transition={{ duration: 0.4, ease: "easeInOut" }}
-                        className="fixed inset-0 bg-black/95 backdrop-blur-xl z-40 flex flex-col justify-center items-center"
-                    >
-                        {/* Decoration */}
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-gold/5 rounded-full blur-[100px]" />
-                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-900/10 rounded-full blur-[100px]" />
+            {/* FULLSCREEN ROYAL MOBILE MENU */}
+            {isMobileMenuOpen && (
+                <div className="fixed inset-0 z-[49] bg-black/95 backdrop-blur-xl flex flex-col justify-center items-center">
+                    {/* Decorative Background */}
+                    <div className="absolute inset-0 opacity-20 pointer-events-none"
+                        style={{
+                            backgroundImage: 'radial-gradient(circle at center, #D4AF37 1px, transparent 1px)',
+                            backgroundSize: '30px 30px'
+                        }}
+                    />
 
-                        <nav className="flex flex-col items-center space-y-8 relative z-10">
-                            {[...leftLinks, ...rightLinks].map((link, idx) => (
-                                <Link
-                                    key={link.name}
-                                    href={link.href}
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                >
-                                    <motion.span
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.1 * idx }}
-                                        className="text-3xl font-cinzel text-white/80 hover:text-gold transition-colors tracking-widest uppercase"
-                                    >
-                                        {link.name}
-                                    </motion.span>
-                                </Link>
-                            ))}
-
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: 0.5 }}
-                                className="pt-8"
+                    <nav className="flex flex-col items-center gap-8 relative z-10">
+                        {navLinks.map((link) => (
+                            <Link
+                                key={link.name}
+                                href={link.href}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="text-3xl font-cinzel text-[#E8E1CF] hover:text-[#D4AF37] transition-colors drop-shadow-md"
                             >
-                                <Link
-                                    href="/ca-portal"
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                    className="px-6 py-2 border border-gold/40 text-gold font-marcellus rounded hover:bg-gold hover:text-black transition-all"
-                                >
-                                    CAMPUS AMBASSADOR
-                                </Link>
-                            </motion.div>
-                        </nav>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                                {link.name}
+                            </Link>
+                        ))}
+                        <div className="w-12 h-[1px] bg-[#D4AF37]/50 my-4" />
+                        <Link
+                            href="/ca-portal"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="text-[#D4AF37] font-marcellus tracking-[0.2em] border border-[#D4AF37]/50 px-8 py-3 rounded-full hover:bg-[#D4AF37] hover:text-black transition-all uppercase"
+                        >
+                            CA Portal
+                        </Link>
+                    </nav>
+                </div>
+            )}
         </>
     );
 }

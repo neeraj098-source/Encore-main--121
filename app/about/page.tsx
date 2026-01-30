@@ -107,10 +107,12 @@ export default function AboutPage() {
             {/* 2. Organizers Team Section */}
             <section className="py-10 px-4 mb-24">
                 <div className="max-w-7xl mx-auto">
-                    <h2 className="text-3xl md:text-4xl font-cinzel text-white text-center mb-16 relative">
-                        <span className="relative z-10 bg-black px-8">Organizers</span>
-                        <div className="absolute top-1/2 left-0 w-full h-px bg-white/10 -z-0" />
-                    </h2>
+                    <div className="relative text-center mb-16">
+                        <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent" />
+                        <h2 className="relative z-10 inline-block bg-black px-6 text-3xl md:text-5xl font-cinzel text-[#D4AF37] uppercase tracking-widest drop-shadow-[0_2px_10px_rgba(212,175,55,0.4)]">
+                            Organizers
+                        </h2>
+                    </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
                         {organizers.map((member, index) => (
@@ -178,10 +180,12 @@ export default function AboutPage() {
             {/* 3. Faculties Section (Bottom) */}
             <section className="py-16 px-4">
                 <div className="max-w-5xl mx-auto">
-                    <h2 className="text-3xl md:text-4xl font-cinzel text-white text-center mb-16 relative">
-                        <span className="relative z-10 bg-black px-8">Faculties</span>
-                        <div className="absolute top-1/2 left-0 w-full h-px bg-white/10 -z-0" />
-                    </h2>
+                    <div className="relative text-center mb-16">
+                        <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent" />
+                        <h2 className="relative z-10 inline-block bg-black px-6 text-3xl md:text-5xl font-cinzel text-[#D4AF37] uppercase tracking-widest drop-shadow-[0_2px_10px_rgba(212,175,55,0.4)]">
+                            Faculties
+                        </h2>
+                    </div>
 
                     <div className="grid md:grid-cols-2 gap-12">
                         {/* Director */}

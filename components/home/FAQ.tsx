@@ -16,28 +16,32 @@ export default function FAQ() {
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
     return (
-        <section className="py-24 px-4 bg-black relative">
+        <section className="py-24 px-4 relative overflow-hidden">
+            {/* Global background visible */}
+
             {/* Bg graphic matching the original site */}
-            <div className="absolute inset-0 bg-[url('/images/faqmob.svg')] bg-cover bg-center opacity-20 pointer-events-none" />
+            <div className="absolute inset-0 bg-[url('/images/faqmob.svg')] bg-cover bg-center opacity-10 pointer-events-none mix-blend-overlay" />
 
-            <div className="max-w-3xl mx-auto relative z-10">
-                <h2 className="text-4xl md:text-5xl font-cinzel text-gold text-center mb-16">Encore FAQ</h2>
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none" />
 
-                <div className="space-y-4">
+            <div className="max-w-4xl mx-auto relative z-10">
+                <h2 className="text-4xl md:text-6xl font-cinzel text-[#D4AF37] text-center mb-20 drop-shadow-md">Encore FAQ</h2>
+
+                <div className="space-y-6">
                     {faqs.map((faq, index) => (
                         <div
                             key={index}
-                            className="bg-gray-900/80 backdrop-blur-md border border-white/10 rounded-xl overflow-hidden"
+                            className={`bg-black/40 backdrop-blur-md border rounded-xl overflow-hidden transition-all duration-300 ${activeIndex === index ? 'border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.1)]' : 'border-[#D4AF37]/20 hover:border-[#D4AF37]/50'}`}
                         >
                             <button
                                 onClick={() => setActiveIndex(activeIndex === index ? null : index)}
-                                className="w-full flex justify-between items-center p-6 text-left hover:bg-white/5 transition-colors"
+                                className="w-full flex justify-between items-center p-6 text-left transition-colors group"
                             >
-                                <span className={`font-cinzel text-lg ${activeIndex === index ? 'text-gold' : 'text-white'}`}>
+                                <span className={`font-cinzel text-lg md:text-xl transition-colors duration-300 ${activeIndex === index ? 'text-[#D4AF37]' : 'text-[#e0e0e0] group-hover:text-[#D4AF37]'}`}>
                                     {faq.question}
                                 </span>
                                 <ChevronDown
-                                    className={`text-gold transition-transform duration-300 ${activeIndex === index ? 'rotate-180' : ''}`}
+                                    className={`text-[#D4AF37] transition-transform duration-300 ${activeIndex === index ? 'rotate-180' : 'opacity-70 group-hover:opacity-100'}`}
                                 />
                             </button>
                             <AnimatePresence>
@@ -49,7 +53,7 @@ export default function FAQ() {
                                         transition={{ duration: 0.3 }}
                                         className="overflow-hidden"
                                     >
-                                        <div className="p-6 pt-0 text-gray-400 font-marcellus leading-relaxed">
+                                        <div className="p-6 pt-0 text-gray-300 font-marcellus leading-relaxed border-t border-[#D4AF37]/10">
                                             {faq.answer}
                                         </div>
                                     </motion.div>

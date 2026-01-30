@@ -17,7 +17,7 @@ export const authOptions: NextAuthOptions = {
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials) {
-                console.log("Login Attempt:", credentials?.email);
+
 
                 if (!credentials?.email || !credentials?.password) {
                     throw new Error("Invalid credentials");
@@ -28,13 +28,13 @@ export const authOptions: NextAuthOptions = {
                 });
 
                 if (!user) {
-                    console.log("Login Failed: User not found");
+
                     throw new Error("User not found");
                 }
 
 
                 if (!user.password) {
-                    console.log("Login Failed: User has no password set");
+
                     throw new Error("Password not set");
                 }
 
@@ -42,11 +42,11 @@ export const authOptions: NextAuthOptions = {
                 const isValid = await bcrypt.compare(credentials.password, user.password);
 
                 if (!isValid) {
-                    console.log("Login Failed: Invalid Password");
+
                     throw new Error("Invalid password");
                 }
 
-                console.log("Login Success:", user.email);
+
                 return user;
             }
         })

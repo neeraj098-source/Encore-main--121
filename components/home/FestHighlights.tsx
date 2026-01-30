@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from 'framer-motion';
 import { Calendar, Users, Trophy, Music } from 'lucide-react';
 
 export default function FestHighlights() {
@@ -12,29 +11,28 @@ export default function FestHighlights() {
     ];
 
     return (
-        <section className="bg-black py-12 relative border-b border-gold/10 overflow-hidden">
-            {/* Background Effects */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/10 to-transparent pointer-events-none" />
-            <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-gold/50 to-transparent" />
+        <section className="relative py-24 border-t border-b border-[#D4AF37]/20 overflow-hidden">
+            {/* Background Effects - Removed bg-black to show global texture */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#D4AF37]/10 to-transparent pointer-events-none" />
+
+            {/* Ornamental Dividers */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent" />
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent" />
 
             <div className="max-w-7xl mx-auto px-4 relative z-10">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
                     {stats.map((stat, index) => (
-                        <motion.div
+                        <div
                             key={index}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.1, duration: 0.5 }}
-                            viewport={{ once: true }}
                             className="flex flex-col items-center text-center group"
                         >
-                            <div className="mb-4 relative">
-                                <div className="absolute inset-0 bg-gold/20 blur-xl rounded-full scale-0 group-hover:scale-150 transition-transform duration-500" />
-                                <stat.icon className="w-8 h-8 text-gold relative z-10" />
+                            <div className="mb-6 relative">
+                                <div className="absolute inset-0 bg-[#FFD700]/30 blur-2xl rounded-full scale-0 group-hover:scale-150 transition-transform duration-700" />
+                                <stat.icon className="w-12 h-12 text-[#D4AF37] relative z-10 drop-shadow-[0_0_10px_rgba(212,175,55,0.5)]" />
                             </div>
-                            <h3 className="text-4xl md:text-5xl font-cinzel text-white font-bold mb-2 tracking-tight group-hover:text-gold transition-colors duration-300">{stat.value}</h3>
-                            <p className="text-sm font-marcellus text-gray-400 uppercase tracking-[0.2em]">{stat.label}</p>
-                        </motion.div>
+                            <h3 className="text-5xl md:text-6xl font-cinzel text-transparent bg-clip-text bg-gradient-to-b from-white to-[#e0e0e0] font-bold mb-3 tracking-tight group-hover:text-[#FFD700] transition-colors duration-500 drop-shadow-sm">{stat.value}</h3>
+                            <p className="text-sm md:text-base font-marcellus text-[#D4AF37] uppercase tracking-[0.25em] border-t border-[#D4AF37]/30 pt-2">{stat.label}</p>
+                        </div>
                     ))}
                 </div>
             </div>

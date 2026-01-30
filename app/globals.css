@@ -1,9 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #000000;
-  --foreground: #ffffff;
-  --nawabi-gold: #FFA500;
+  --background: #050505; /* Deep Charcoal/Black */
+  --foreground: #e0e0e0; /* Soft White */
+  --nawabi-gold: #D4AF37; /* Metallic Gold */
+  --nawabi-gold-glow: #FFD700; /* Bright Gold for effects */
 }
 
 @theme inline {
@@ -34,4 +35,16 @@ body {
 
 .font-marcellus {
   font-family: var(--font-marcellus), serif;
+}
+@keyframes float-particle {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  20% { opacity: 0.6; }
+  80% { opacity: 0.6; }
+  100% { transform: translateY(-100px) translateX(20px); opacity: 0; }
+}
+
+.animate-float-particle {
+  animation-name: float-particle;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
 }

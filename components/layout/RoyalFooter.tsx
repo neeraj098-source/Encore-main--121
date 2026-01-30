@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Instagram, Youtube, Mail, MapPin, Phone } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Instagram, Youtube, Mail, MapPin, Phone, Facebook, Twitter } from 'lucide-react';
+
 
 export default function RoyalFooter() {
     return (
@@ -58,12 +58,9 @@ export default function RoyalFooter() {
                             </li>
                             <li className="flex items-center gap-3">
                                 <Mail className="w-4 h-4 text-gold shrink-0" />
-                                <a href="mailto:contact@encoreiet.com" className="hover:text-white transition-colors">contact@encoreiet.com</a>
+                                <a href="mailto:encore@ietlucknow.ac.in" className="hover:text-white transition-colors">encore@ietlucknow.ac.in</a>
                             </li>
-                            <li className="flex items-center gap-3">
-                                <Phone className="w-4 h-4 text-gold shrink-0" />
-                                <span>+91 99999 99999</span>
-                            </li>
+
                         </ul>
                     </div>
 
@@ -76,6 +73,12 @@ export default function RoyalFooter() {
                         <div className="flex space-x-4 mb-8">
                             <a href="#" className="w-10 h-10 rounded-full border border-gold/30 flex items-center justify-center text-gold hover:bg-gold hover:text-black transition-all duration-300">
                                 <Instagram size={18} />
+                            </a>
+                            <a href="#" className="w-10 h-10 rounded-full border border-gold/30 flex items-center justify-center text-gold hover:bg-gold hover:text-black transition-all duration-300">
+                                <Facebook size={18} />
+                            </a>
+                            <a href="#" className="w-10 h-10 rounded-full border border-gold/30 flex items-center justify-center text-gold hover:bg-gold hover:text-black transition-all duration-300">
+                                <Twitter size={18} />
                             </a>
                             <a href="#" className="w-10 h-10 rounded-full border border-gold/30 flex items-center justify-center text-gold hover:bg-gold hover:text-black transition-all duration-300">
                                 <Youtube size={18} />

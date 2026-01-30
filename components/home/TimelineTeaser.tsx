@@ -1,13 +1,40 @@
 "use client";
 
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef } from 'react';
+import { motion, useScroll } from 'framer-motion';
+import { useRef, useState, useEffect } from 'react';
 
 export default function TimelineTeaser() {
     const containerRef = useRef<HTMLDivElement>(null);
+    const firstNodeRef = useRef<HTMLHTMLDivElement>(null);
+    const lastNodeRef = useRef<HTMLHTMLDivElement>(null);
+    const [lineStyle, setLineStyle] = useState({ top: 0, height: 0 });
+
+    // Measure positions to align the line exactly center-to-center
+    useEffect(() => {
+        const updatePosition = () => {
+            if (containerRef.current && firstNodeRef.current && lastNodeRef.current) {
+                const containerRect = containerRef.current.getBoundingClientRect();
+                const firstRect = firstNodeRef.current.getBoundingClientRect();
+                const lastRect = lastNodeRef.current.getBoundingClientRect();
+
+                const top = firstRect.top - containerRect.top + (firstRect.height / 2);
+                const bottom = lastRect.top - containerRect.top + (lastRect.height / 2);
+                const height = bottom - top;
+
+                setLineStyle({ top, height });
+            }
+        };
+
+        updatePosition();
+        window.addEventListener('resize', updatePosition);
+        return () => window.removeEventListener('resize', updatePosition);
+    }, []);
+
+    // Scroll progress for the drawing animation
+    // We target the container but adjust offsets to match the line's visual start
     const { scrollYProgress } = useScroll({
         target: containerRef,
-        offset: ["start end", "end start"]
+        offset: ["start 60%", "end 40%"] // Starts drawing when top of container is at 60% viewport height
     });
 
     const events = [
@@ -35,7 +62,7 @@ export default function TimelineTeaser() {
     ];
 
     return (
-        <section ref={containerRef} className="relative bg-[#0a0a0a] min-h-screen py-32 overflow-hidden flex flex-col items-center justify-center">
+        <section className="relative bg-[#0a0a0a] min-h-screen py-32 overflow-hidden flex flex-col items-center justify-center">
 
             {/* Background Texture & Elements */}
             <div className="absolute inset-0 opacity-20 pointer-events-none"
@@ -85,18 +112,16 @@ export default function TimelineTeaser() {
             </motion.div>
 
             {/* Timeline Container */}
-            <div className="relative w-full max-w-6xl mx-auto px-6 md:px-12 flex flex-col gap-24 md:gap-32">
+            <div ref={containerRef} className="relative w-full max-w-6xl mx-auto px-6 md:px-12 flex flex-col gap-24 md:gap-32">
 
-                {/* Central Line */}
-                <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-[2px] bg-white/5 -translate-x-1/2 md:translate-x-0">
+                {/* Central Line - Positioned precisely via JS */}
+                <div
+                    className="absolute left-4 md:left-1/2 w-[2px] bg-white/5 -translate-x-1/2 md:translate-x-0"
+                    style={{ top: lineStyle.top, height: lineStyle.height }}
+                >
                     <motion.div
-                        className="w-full bg-gradient-to-b from-transparent via-gold to-transparent box-shadow-[0_0_15px_#FFD700]"
-                        style={{ height: scrollYProgress.get() * 100 + "%", maxHeight: '100%' }} // Simple height animation based on scroll might need adjustment, using transform scaleY is cleaner but height works for gradient fill simulation if container is fixed
-                    />
-                    {/* Better scroll progress line */}
-                    <motion.div
-                        className="absolute top-0 left-0 w-full bg-gold origin-top shadow-[0_0_10px_#FFD700]"
-                        style={{ scaleY: scrollYProgress, height: '100%' }}
+                        className="w-full bg-gradient-to-b from-gold via-yellow-200 to-gold shadow-[0_0_15px_#FFD700] origin-top"
+                        style={{ scaleY: scrollYProgress }}
                     />
                 </div>
 
@@ -107,7 +132,7 @@ export default function TimelineTeaser() {
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: index * 0.2 }}
                         viewport={{ once: true, margin: "-100px" }}
-                        className={`relative flex flex-col md:flex-row items-start md:items-center w-full ${event.align === 'right' ? 'md:flex-row-reverse' : ''}`}
+                        className={`relative flex flex-col md:flex-row items-center w-full ${event.align === 'right' ? 'md:flex-row-reverse' : ''}`}
                     >
                         {/* Content Side */}
                         <div className={`w-full md:w-5/12 pl-12 md:pl-0 ${event.align === 'right' ? 'md:pl-16 text-left' : 'md:pr-16 md:text-right'}`}>
@@ -128,13 +153,14 @@ export default function TimelineTeaser() {
                         </div>
 
                         {/* Central Node */}
-                        <div className="absolute left-4 md:left-1/2 -translate-x-1/2 w-8 h-8 md:w-12 md:h-12 flex items-center justify-center z-20 mt-2 md:mt-0">
+                        <div
+                            ref={index === 0 ? firstNodeRef : index === events.length - 1 ? lastNodeRef : null}
+                            className="absolute left-4 md:left-1/2 -translate-x-1/2 w-8 h-8 md:w-12 md:h-12 flex items-center justify-center z-20"
+                        >
                             <div className="w-3 h-3 md:w-4 md:h-4 bg-gold rounded-full shadow-[0_0_15px_#FFD700] animate-pulse" />
                             <div className="absolute inset-0 border border-gold/40 rounded-full scale-110" />
                             <div className="absolute inset-0 border border-gold/20 rounded-full scale-150 animate-ping-slow" />
                         </div>
-
-                        {/* Empty Space for alignment */}
                         <div className="w-full md:w-5/12 hidden md:block" />
                     </motion.div>
                 ))}

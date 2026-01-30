@@ -41,21 +41,21 @@ export default function TimelineTeaser() {
         {
             day: "DAY 01",
             title: "The Grand Awakening",
-            date: "FEBRUARY 20",
+            date: "FEBRUARY 19",
             description: "Inauguration • Prelims • Literature",
             align: "left"
         },
         {
             day: "DAY 02",
             title: "Rhythm of Royalty",
-            date: "FEBRUARY 21",
+            date: "FEBRUARY 20",
             description: "Dance • Drama • Fine Arts",
             align: "right"
         },
         {
             day: "DAY 03",
             title: "The Final Crescendo",
-            date: "FEBRUARY 22",
+            date: "FEBRUARY 21",
             description: "Grand Finale • Celebrity Night",
             align: "left"
         },

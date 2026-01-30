@@ -4,6 +4,7 @@ import Navbar from "@/components/layout/Navbar";
 import RoyalFooter from "@/components/layout/RoyalFooter";
 import Loader from "@/components/ui/Loader";
 import CornerCurtains from "@/components/ui/CornerCurtains";
+import Particles from "@/components/ui/Particles";
 import "./globals.css";
 
 const cinzel = Cinzel({
@@ -55,7 +56,7 @@ export default function RootLayout({
         {/* Cinematic Background Layer System */}
         <div className="fixed inset-0 z-[-1]">
           {/* Layer 1: Deep Charcoal Gradient Base */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a1a] via-black to-black" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-black to-black" />
 
           {/* Layer 2: Mughal Manuscript Texture (Low Opacity) */}
           <div
@@ -63,15 +64,20 @@ export default function RootLayout({
             style={{ backgroundImage: 'url("/images/backgrounds/royal-texture.png")' }}
           />
 
-          {/* Layer 3: Floating Golden Dust Particles */}
-          <div className="absolute inset-0 opacity-40">
-            <div className="absolute inset-0 bg-[url('/images/texture-noise.png')] opacity-20 animate-pulse" />
-            {/* We can re-use the Particles component here if imported, or keep it simple with CSS for now since Particles is a client component and this is Layout */}
+          {/* Layer 3: Floating Golden Dust Particles (Canvas) */}
+          <div className="absolute inset-0 opacity-60">
+            <Particles
+              className="absolute inset-0"
+              quantity={40}
+              staticity={20}
+              ease={50}
+              refresh={false}
+              color="#FFD700"
+            />
           </div>
 
           {/* Layer 4: Soft Vignette & Warm Glow */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)]" />
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gold/5 blur-[100px] rounded-full pointer-events-none" />
         </div>
 
         <Loader />

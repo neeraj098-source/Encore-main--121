@@ -7,7 +7,7 @@ export default function PageWrapper({ children }: { children: React.ReactNode })
     const isHome = pathname === '/';
 
     return (
-        <main className={`relative ${isHome ? '' : 'pt-24'}`}>
+        <main className="relative">
             {children}
         </main>
     );

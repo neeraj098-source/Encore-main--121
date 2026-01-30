@@ -105,58 +105,72 @@ export default function AboutPage() {
             </section>
 
             {/* 2. Organizers Team Section */}
-            <section className="py-10 px-4 mb-24">
+            <section className="py-10 px-4 mb-24 relative z-10">
                 <div className="max-w-7xl mx-auto">
-                    <div className="relative text-center mb-16">
-                        <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent" />
-                        <h2 className="relative z-10 inline-block bg-black px-6 text-3xl md:text-5xl font-cinzel text-[#D4AF37] uppercase tracking-widest drop-shadow-[0_2px_10px_rgba(212,175,55,0.4)]">
+                    <div className="relative text-center mb-20">
+                        {/* Decorative side lines */}
+                        <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/40 to-transparent" />
+                        <h2 className="relative z-10 inline-block bg-black px-12 text-4xl md:text-6xl font-cinzel text-[#D4AF37] uppercase tracking-[0.2em] drop-shadow-[0_2px_15px_rgba(212,175,55,0.3)]">
                             Organizers
                         </h2>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 justify-items-center">
                         {organizers.map((member, index) => (
                             <motion.div
                                 key={member.id}
-                                initial={{ opacity: 0, y: 20 }}
+                                initial={{ opacity: 0, y: 30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ delay: index * 0.1 }}
-                                className={`w-full max-w-sm bg-white/5 border border-white/10 rounded-2xl p-6 text-center group hover:border-gold/30 transition-all relative overflow-hidden ${member.isHighlight ? 'bg-gradient-to-b from-gold/5 to-transparent' : ''
-                                    }`}
+                                transition={{ delay: index * 0.1, duration: 0.6 }}
+                                className="w-full max-w-sm bg-[#050505] border border-[#D4AF37]/30 rounded-xl p-8 text-center group relative overflow-hidden shadow-[0_0_25px_rgba(0,0,0,0.8)] hover:shadow-[0_0_35px_rgba(212,175,55,0.15)] hover:border-[#D4AF37]/60 transition-all duration-500"
                             >
-                                <div className={`w-40 h-40 mx-auto rounded-full mb-6 relative overflow-hidden border-2 transition-transform duration-500 group-hover:scale-105 ${member.isHighlight ? 'border-gold shadow-[0_0_15px_rgba(255,215,0,0.2)]' : 'border-white/20'}`}>
-                                    {member.image ? (
-                                        <Image
-                                            src={member.image}
-                                            alt={member.name}
-                                            fill
-                                            className="object-cover transition-transform duration-500 group-hover:scale-110"
-                                        />
-                                    ) : (
-                                        <div className="absolute inset-0 flex items-center justify-center bg-white/5 text-white/20 group-hover:text-gold/50 transition-colors">
-                                            <Users size={48} />
-                                        </div>
-                                    )}
+                                {/* Royal Corner Accents (CSS based) */}
+                                <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-[#D4AF37]/40 rounded-tl-md group-hover:border-[#D4AF37] transition-colors" />
+                                <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-[#D4AF37]/40 rounded-tr-md group-hover:border-[#D4AF37] transition-colors" />
+                                <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-[#D4AF37]/40 rounded-bl-md group-hover:border-[#D4AF37] transition-colors" />
+                                <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-[#D4AF37]/40 rounded-br-md group-hover:border-[#D4AF37] transition-colors" />
+
+                                <div className="w-44 h-44 mx-auto rounded-full mb-6 relative overflow-visible">
+                                    {/* Double Ring Frame Effect */}
+                                    <div className="absolute inset-[-6px] rounded-full border border-[#D4AF37]/20 group-hover:border-[#D4AF37]/40 group-hover:scale-105 transition-all duration-500" />
+                                    <div className="absolute inset-0 rounded-full border-2 border-[#D4AF37] shadow-[0_0_20px_rgba(212,175,55,0.3)] overflow-hidden">
+                                        {member.image ? (
+                                            <Image
+                                                src={member.image}
+                                                alt={member.name}
+                                                fill
+                                                className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                            />
+                                        ) : (
+                                            <div className="absolute inset-0 flex items-center justify-center bg-zinc-900 text-[#D4AF37]/40">
+                                                <Users size={48} />
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
 
-                                <h3 className={`text-xl font-cinzel mb-2 ${member.isHighlight ? 'text-white' : 'text-gray-200'}`}>
+                                <h3 className="text-2xl font-cinzel text-[#E8E1CF] mb-3 group-hover:text-[#D4AF37] transition-colors duration-300">
                                     {member.name}
                                 </h3>
-                                <p className={`font-marcellus text-sm tracking-widest uppercase mb-6 ${member.isHighlight ? 'text-gold' : 'text-gray-500'}`}>
-                                    {member.role}
-                                </p>
+
+                                <div className="inline-block relative mb-8">
+                                    <p className="font-marcellus text-[#D4AF37] text-xs tracking-[0.25em] uppercase pb-2 border-b border-[#D4AF37]/30">
+                                        {member.role}
+                                    </p>
+                                    <div className="absolute -bottom-[1px] left-1/2 -translate-x-1/2 w-1/2 h-[1px] bg-[#D4AF37]" />
+                                </div>
 
                                 {/* Social Links Overlay */}
-                                <div className="flex justify-center gap-4 opacity-0 transform translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                                <div className="flex justify-center gap-6 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 delay-75">
                                     {member.socials?.instagram && (
                                         <Link
                                             href={member.socials.instagram}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-gray-400 hover:text-gold transition-colors"
+                                            className="text-[#D4AF37]/70 hover:text-[#D4AF37] hover:scale-110 transition-all"
                                         >
-                                            <Instagram size={20} />
+                                            <Instagram size={22} />
                                         </Link>
                                     )}
                                     {member.socials?.linkedin && (
@@ -164,12 +178,11 @@ export default function AboutPage() {
                                             href={member.socials.linkedin}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-gray-400 hover:text-gold transition-colors"
+                                            className="text-[#D4AF37]/70 hover:text-[#D4AF37] hover:scale-110 transition-all"
                                         >
-                                            <Linkedin size={20} />
+                                            <Linkedin size={22} />
                                         </Link>
                                     )}
-
                                 </div>
                             </motion.div>
                         ))}
@@ -181,8 +194,8 @@ export default function AboutPage() {
             <section className="py-16 px-4">
                 <div className="max-w-5xl mx-auto">
                     <div className="relative text-center mb-16">
-                        <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent" />
-                        <h2 className="relative z-10 inline-block bg-black px-6 text-3xl md:text-5xl font-cinzel text-[#D4AF37] uppercase tracking-widest drop-shadow-[0_2px_10px_rgba(212,175,55,0.4)]">
+                        <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/30 to-transparent" />
+                        <h2 className="relative z-10 inline-block bg-black px-8 text-3xl md:text-4xl font-cinzel text-[#D4AF37]/80 uppercase tracking-widest">
                             Faculties
                         </h2>
                     </div>
@@ -193,19 +206,19 @@ export default function AboutPage() {
                             initial={{ opacity: 0, x: -30 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
-                            className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center hover:bg-white/10 transition-colors"
+                            className="bg-[#080808] border border-white/5 rounded-2xl p-8 text-center group hover:bg-[#0c0c0c] hover:border-[#D4AF37]/20 transition-all duration-500"
                         >
-                            <div className="w-48 h-48 mx-auto rounded-full overflow-hidden border-2 border-gold/50 mb-6 relative bg-white/5">
+                            <div className="w-40 h-40 mx-auto rounded-full overflow-hidden border border-[#D4AF37]/30 mb-6 relative shadow-[0_0_15px_rgba(0,0,0,0.5)] group-hover:border-[#D4AF37]/60 transition-colors">
                                 <Image
                                     src="/images/team/dr_vineet_kansal.jpg"
                                     alt="Dr. Vineet Kansal"
                                     fill
-                                    className="object-cover"
+                                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                                 />
                             </div>
-                            <h3 className="text-2xl font-cinzel text-gold mb-2">Dr. Vineet Kansal</h3>
-                            <p className="text-purple-400 font-medium tracking-wider text-sm mb-4 uppercase">Director, IET Lucknow</p>
-                            <p className="text-gray-400 font-marcellus text-sm leading-relaxed">
+                            <h3 className="text-2xl font-cinzel text-[#E8E1CF] mb-2 group-hover:text-[#D4AF37] transition-colors">Dr. Vineet Kansal</h3>
+                            <p className="text-[#D4AF37]/80 font-marcellus text-sm tracking-[0.15em] mb-4 uppercase">Director, IET Lucknow</p>
+                            <p className="text-gray-500 font-marcellus text-sm leading-relaxed max-w-sm mx-auto">
                                 Guiding the institute towards excellence with visionary leadership.
                             </p>
                         </motion.div>
@@ -215,19 +228,19 @@ export default function AboutPage() {
                             initial={{ opacity: 0, x: 30 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
-                            className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center hover:bg-white/10 transition-colors"
+                            className="bg-[#080808] border border-white/5 rounded-2xl p-8 text-center group hover:bg-[#0c0c0c] hover:border-[#D4AF37]/20 transition-all duration-500"
                         >
-                            <div className="w-48 h-48 mx-auto rounded-full overflow-hidden border-2 border-gold/50 mb-6 relative bg-white/5">
+                            <div className="w-40 h-40 mx-auto rounded-full overflow-hidden border border-[#D4AF37]/30 mb-6 relative shadow-[0_0_15px_rgba(0,0,0,0.5)] group-hover:border-[#D4AF37]/60 transition-colors">
                                 <Image
                                     src="/images/team/dr_satyendra_singh.png"
                                     alt="Dr. Satyendra Singh"
                                     fill
-                                    className="object-cover"
+                                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                                 />
                             </div>
-                            <h3 className="text-2xl font-cinzel text-gold mb-2">Dr. Satyendra Singh</h3>
-                            <p className="text-purple-400 font-medium tracking-wider text-sm mb-4 uppercase">Chairman, ISSACC</p>
-                            <p className="text-gray-400 font-marcellus text-sm leading-relaxed">
+                            <h3 className="text-2xl font-cinzel text-[#E8E1CF] mb-2 group-hover:text-[#D4AF37] transition-colors">Dr. Satyendra Singh</h3>
+                            <p className="text-[#D4AF37]/80 font-marcellus text-sm tracking-[0.15em] mb-4 uppercase">Chairman, ISSACC</p>
+                            <p className="text-gray-500 font-marcellus text-sm leading-relaxed max-w-sm mx-auto">
                                 Orchestrating the cultural vibrancy of the campus and fostering creativity.
                             </p>
                         </motion.div>

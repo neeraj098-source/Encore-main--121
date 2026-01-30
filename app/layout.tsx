@@ -50,22 +50,36 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark scroll-smooth">
       <body
-        className={`${cinzel.variable} ${marcellus.variable} antialiased min-h-screen text-white overflow-x-hidden relative`}
+        className={`${cinzel.variable} ${marcellus.variable} antialiased bg-black min-h-screen text-white overflow-x-hidden selection:bg-gold/30`}
       >
-        {/* Global Background */}
+        {/* Cinematic Background Layer System */}
         <div className="fixed inset-0 z-[-1]">
-          <div className="absolute inset-0 bg-black" />
+          {/* Layer 1: Deep Charcoal Gradient Base */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a1a] via-black to-black" />
+
+          {/* Layer 2: Mughal Manuscript Texture (Low Opacity) */}
           <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 mix-blend-screen"
-            style={{ backgroundImage: 'url("/images/backgrounds/royal-bg.png")' }}
+            className="absolute inset-0 opacity-[0.15] bg-cover bg-center mix-blend-overlay"
+            style={{ backgroundImage: 'url("/images/backgrounds/royal-texture.png")' }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/80" />
+
+          {/* Layer 3: Floating Golden Dust Particles */}
+          <div className="absolute inset-0 opacity-40">
+            <div className="absolute inset-0 bg-[url('/images/texture-noise.png')] opacity-20 animate-pulse" />
+            {/* We can re-use the Particles component here if imported, or keep it simple with CSS for now since Particles is a client component and this is Layout */}
+          </div>
+
+          {/* Layer 4: Soft Vignette & Warm Glow */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)]" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gold/5 blur-[100px] rounded-full pointer-events-none" />
         </div>
 
         <Loader />
         <CornerCurtains />
         <Navbar />
-        {children}
+        <main className="relative z-10">
+          {children}
+        </main>
         <RoyalFooter />
       </body>
     </html>

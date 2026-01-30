@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
 
 export default function TimelineTeaser() {
@@ -119,9 +119,16 @@ export default function TimelineTeaser() {
                     className="absolute left-4 md:left-1/2 w-[2px] bg-white/5 -translate-x-1/2 md:translate-x-0"
                     style={{ top: lineStyle.top, height: lineStyle.height }}
                 >
+                    {/* The drawing line */}
                     <motion.div
-                        className="w-full bg-gradient-to-b from-gold via-yellow-200 to-gold shadow-[0_0_15px_#FFD700] origin-top"
+                        className="w-full h-full bg-[#FFD700] origin-top shadow-[0_0_15px_#FFD700]"
                         style={{ scaleY: scrollYProgress }}
+                    />
+
+                    {/* The glowing leading point */}
+                    <motion.div
+                        className="absolute left-1/2 -translate-x-1/2 w-3 h-3 bg-[#FFD700] rounded-full blur-[2px] shadow-[0_0_20px_#FFD700]"
+                        style={{ top: useTransform(scrollYProgress, [0, 1], ["0%", "100%"]), x: "-50%", y: "-50%" }}
                     />
                 </div>
 

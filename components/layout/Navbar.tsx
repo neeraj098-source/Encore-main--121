@@ -71,11 +71,11 @@ export default function Navbar() {
         <>
             {/* ROYAL FLOATING NAVBAR */}
             <motion.header
-                className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-5xl"
-                initial={{ y: 0, x: "-50%" }}
+                className="fixed top-6 left-1/2 z-50 w-[95%] max-w-5xl"
+                initial={{ x: "-50%", y: 0 }}
                 animate={{
-                    y: isCurtainDown ? 0 : -150,
-                    x: "-50%"
+                    x: "-50%",
+                    y: isCurtainDown ? 0 : -150
                 }}
                 transition={{ duration: 0.5, ease: "easeInOut" }}
             >
@@ -87,49 +87,28 @@ export default function Navbar() {
                     {/* Inner Gold Frame Border */}
                     <div className="absolute inset-1 rounded-full border border-[#D4AF37]/10 pointer-events-none" />
 
-                    <div className="flex items-center justify-between relative z-10 w-full min-h-[50px]">
+                    <div className="flex items-center justify-between relative z-10 w-full">
 
-                        {/* LEFT: Menu / Links */}
-                        <div className="flex items-center gap-4">
+                        {/* LEFT: Navigation Links */}
+                        <div className="flex items-center gap-8 pl-4">
+                            {/* Mobile Menu Button */}
                             <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden text-[#D4AF37]">
                                 {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
                             </button>
 
-                            {/* Desktop Links (Left Side) */}
-                            <nav className="hidden md:flex items-center gap-8 pl-4">
+                            {/* Desktop Links - All on Left */}
+                            <nav className="hidden md:flex items-center gap-8">
                                 <Link href="/" className="text-[#E8E1CF] hover:text-[#D4AF37] font-cinzel tracking-wider text-sm transition-colors uppercase">Home</Link>
                                 <Link href="/events" className="text-[#E8E1CF] hover:text-[#D4AF37] font-cinzel tracking-wider text-sm transition-colors uppercase">Events</Link>
-                            </nav>
-                        </div>
-
-                        {/* CENTER: Royal Logo Emblem (Absolute Centered) */}
-                        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
-                            <Link href="/" className="group block relative">
-                                <div className="relative w-16 h-16 md:w-20 md:h-20 flex items-center justify-center">
-                                    {/* Gold Glow behind logo */}
-                                    <div className="absolute inset-0 bg-[#D4AF37]/20 blur-[20px] rounded-full opacity-50 group-hover:opacity-80 transition-opacity duration-500" />
-                                    <Image
-                                        src="/images/iet_logo_new.png"
-                                        alt="Encore Logo"
-                                        width={64}
-                                        height={64}
-                                        className="object-contain drop-shadow-[0_2px_10px_rgba(212,175,55,0.5)] z-10 group-hover:scale-105 transition-transform duration-300"
-                                        priority
-                                    />
-                                </div>
-                            </Link>
-                        </div>
-
-                        {/* RIGHT: Links + Actions */}
-                        <div className="flex items-center gap-6 pr-4">
-                            {/* Desktop Links (Right Side) */}
-                            <nav className="hidden md:flex items-center gap-8">
                                 <Link href="/sponsorship" className="text-[#E8E1CF] hover:text-[#D4AF37] font-cinzel tracking-wider text-sm transition-colors uppercase">Sponsors</Link>
                                 <Link href="/about" className="text-[#E8E1CF] hover:text-[#D4AF37] font-cinzel tracking-wider text-sm transition-colors uppercase">About</Link>
                             </nav>
+                        </div>
 
-                            <div className="h-4 w-[1px] bg-[#D4AF37]/30 hidden md:block" />
+                        {/* RIGHT: Actions + Logo */}
+                        <div className="flex items-center gap-6 pr-4">
 
+                            {/* Actions (CA, Cart, User) */}
                             <div className="flex items-center gap-5 text-[#D4AF37]">
                                 <Link href="/ca-portal" className="hidden md:block text-xs font-marcellus tracking-widest hover:text-white transition-colors border-b border-transparent hover:border-[#D4AF37]">
                                     CA PORTAL
@@ -144,6 +123,24 @@ export default function Navbar() {
                                     <User size={18} />
                                 </Link>
                             </div>
+
+                            <div className="h-8 w-[1px] bg-[#D4AF37]/30 hidden md:block" />
+
+                            {/* Logo */}
+                            <Link href="/" className="group block relative">
+                                <div className="relative w-12 h-12 md:w-16 md:h-16 flex items-center justify-center">
+                                    {/* Gold Glow behind logo */}
+                                    <div className="absolute inset-0 bg-[#D4AF37]/20 blur-[15px] rounded-full opacity-50 group-hover:opacity-80 transition-opacity duration-500" />
+                                    <Image
+                                        src="/images/iet_logo_new.png"
+                                        alt="Encore Logo"
+                                        width={64}
+                                        height={64}
+                                        className="object-contain drop-shadow-[0_2px_10px_rgba(212,175,55,0.5)] z-10 group-hover:scale-105 transition-transform duration-300"
+                                        priority
+                                    />
+                                </div>
+                            </Link>
                         </div>
 
                     </div>

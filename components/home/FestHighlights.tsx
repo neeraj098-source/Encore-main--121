@@ -12,26 +12,28 @@ export default function FestHighlights() {
     ];
 
     return (
-        <section className="bg-[#EBE5CE] py-20 relative border-b border-gold/20 overflow-hidden text-black">
-            {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/40 to-transparent pointer-events-none" />
+        <section className="bg-black py-12 relative border-b border-gold/10 overflow-hidden">
+            {/* Background Effects */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/10 to-transparent pointer-events-none" />
+            <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-gold/50 to-transparent" />
 
             <div className="max-w-7xl mx-auto px-4 relative z-10">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                     {stats.map((stat, index) => (
                         <motion.div
                             key={index}
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: index * 0.1, duration: 0.5, type: 'spring' }}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.1, duration: 0.5 }}
                             viewport={{ once: true }}
                             className="flex flex-col items-center text-center group"
                         >
-                            <div className="mb-6 p-4 rounded-full bg-black/5 border border-black/10 group-hover:bg-gold/20 group-hover:border-gold/50 transition-all duration-300 transform group-hover:scale-110">
-                                <stat.icon className="w-10 h-10 text-black group-hover:text-black transition-colors" />
+                            <div className="mb-4 relative">
+                                <div className="absolute inset-0 bg-gold/20 blur-xl rounded-full scale-0 group-hover:scale-150 transition-transform duration-500" />
+                                <stat.icon className="w-8 h-8 text-gold relative z-10" />
                             </div>
-                            <h3 className="text-5xl md:text-6xl font-cinzel font-bold mb-2 text-black drop-shadow-sm">{stat.value}</h3>
-                            <p className="text-lg md:text-xl font-marcellus text-gray-800 uppercase tracking-[0.2em] font-bold">{stat.label}</p>
+                            <h3 className="text-4xl md:text-5xl font-cinzel text-white font-bold mb-2 tracking-tight group-hover:text-gold transition-colors duration-300">{stat.value}</h3>
+                            <p className="text-sm font-marcellus text-gray-400 uppercase tracking-[0.2em]">{stat.label}</p>
                         </motion.div>
                     ))}
                 </div>

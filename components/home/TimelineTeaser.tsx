@@ -34,7 +34,7 @@ export default function TimelineTeaser() {
     // We target the container but adjust offsets to match the line's visual start
     const { scrollYProgress } = useScroll({
         target: containerRef,
-        offset: ["start 60%", "end 40%"] // Starts drawing when top of container is at 60% viewport height
+        offset: ["start 70%", "end 50%"] // Starts drawing a bit earlier
     });
 
     const events = [
@@ -121,14 +121,8 @@ export default function TimelineTeaser() {
                 >
                     {/* The drawing line */}
                     <motion.div
-                        className="w-full h-full bg-[#FFD700] origin-top shadow-[0_0_15px_#FFD700]"
+                        className="w-full h-full bg-[#FFD700] origin-top"
                         style={{ scaleY: scrollYProgress }}
-                    />
-
-                    {/* The glowing leading point */}
-                    <motion.div
-                        className="absolute left-1/2 -translate-x-1/2 w-3 h-3 bg-[#FFD700] rounded-full blur-[2px] shadow-[0_0_20px_#FFD700]"
-                        style={{ top: useTransform(scrollYProgress, [0, 1], ["0%", "100%"]), x: "-50%", y: "-50%" }}
                     />
                 </div>
 

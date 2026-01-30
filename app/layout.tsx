@@ -50,8 +50,18 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark scroll-smooth">
       <body
-        className={`${cinzel.variable} ${marcellus.variable} antialiased bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#191970] via-[#050510] to-black min-h-screen text-white overflow-x-hidden`}
+        className={`${cinzel.variable} ${marcellus.variable} antialiased min-h-screen text-white overflow-x-hidden relative`}
       >
+        {/* Global Background */}
+        <div className="fixed inset-0 z-[-1]">
+          <div className="absolute inset-0 bg-black" />
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 mix-blend-screen"
+            style={{ backgroundImage: 'url("/images/backgrounds/royal-bg.png")' }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/80" />
+        </div>
+
         <Loader />
         <CornerCurtains />
         <Navbar />

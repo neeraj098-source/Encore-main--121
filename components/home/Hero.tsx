@@ -73,79 +73,82 @@ export default function Hero() {
         <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-black">
             {/* Pure Black Background - Video Removed */}
 
-            {/* --- Decorative Architectural Images (Rumi Darwaza Halves) --- */}
+            <div className="relative z-20 flex flex-col items-center justify-center min-h-[90vh] text-center px-4 w-full">
 
-            {/* Left Half - Bottom Left */}
-            <motion.div
-                variants={leftGateVariant}
-                initial="hidden"
-                animate="visible"
-                className="absolute bottom-0 left-0 w-[50vw] h-[35vh] md:w-[35vw] md:h-[65vh] z-10 pointer-events-none"
-            >
-                <div className="relative w-full h-full">
-                    <Image
-                        src="/images/roomi_right.png"
-                        alt="Roomi Left"
-                        fill
-                        className="object-contain object-bottom md:object-left-bottom"
-                        priority
-                    />
+                {/* Architectural Frame - Centered Arch */}
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 1.5, ease: "easeOut" }}
+                    className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none"
+                >
+                    <div className="relative w-full h-full max-w-5xl aspect-[4/3] md:aspect-video opacity-80">
+                        <Image
+                            src="/images/mughal-arch.png"
+                            alt="Mughal Arch Frame"
+                            fill
+                            className="object-contain"
+                            priority
+                        />
+                    </div>
+                </motion.div>
+
+                {/* Main Content inside the Arch */}
+                <div className="relative z-10 pt-20 md:pt-32">
+                    <motion.p
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5, duration: 0.8 }}
+                        className="text-gold font-marcellus text-xs md:text-sm tracking-[0.4em] mb-4 uppercase"
+                    >
+                        The Annual Cultural Fest of IET Lucknow
+                    </motion.p>
+
+                    <motion.h1
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.8, duration: 1 }}
+                        className="text-7xl md:text-9xl font-cinzel text-white mb-2 tracking-tight relative drop-shadow-2xl"
+                    >
+                        ENCORE
+                        <span className="absolute -top-2 -right-4 md:-top-4 md:-right-8 text-2xl md:text-4xl text-gold font-marcellus rotate-12">26</span>
+                    </motion.h1>
+
+                    <motion.h2
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 1.2, duration: 1 }}
+                        className="text-2xl md:text-4xl font-cinzel text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-gold to-amber-200 tracking-[0.3em] mb-12 shadow-gold/20"
+                    >
+                        NAWABI ELEGANCE
+                    </motion.h2>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 1.5, duration: 0.8 }}
+                        className="flex flex-col md:flex-row gap-4 justify-center items-center"
+                    >
+                        <Link href="/events">
+                            <Button size="lg" className="w-56 h-14 text-lg bg-gold text-black border-gold hover:bg-white hover:text-black hover:border-white transition-all duration-300 font-cinzel font-bold tracking-widest uppercase">
+                                Explore Events
+                            </Button>
+                        </Link>
+
+                        <Link href="/#highlights">
+                            <Button variant="outline" size="lg" className="w-56 h-14 text-lg border-white/30 text-white hover:bg-white/10 hover:border-gold hover:text-gold transition-all duration-300 font-cinzel tracking-widest uppercase">
+                                Past Highlights
+                            </Button>
+                        </Link>
+
+                        <Link href={isLoggedIn ? "/dashboard" : "/login"}>
+                            <Button variant="outline" size="lg" className="w-56 h-14 text-lg border-white/30 text-white hover:bg-white/10 hover:border-gold hover:text-gold transition-all duration-300 font-cinzel tracking-widest uppercase">
+                                {isLoggedIn ? "Dashboard" : "Register Now"}
+                            </Button>
+                        </Link>
+                    </motion.div>
                 </div>
-            </motion.div>
-
-            {/* Right Half - Bottom Right */}
-            <motion.div
-                variants={rightGateVariant}
-                initial="hidden"
-                animate="visible"
-                className="absolute bottom-0 right-0 w-[50vw] h-[35vh] md:w-[35vw] md:h-[65vh] z-10 pointer-events-none"
-            >
-                <div className="relative w-full h-full">
-                    <Image
-                        src="/images/roomi_left.png"
-                        alt="Roomi Right"
-                        fill
-                        className="object-contain object-bottom md:object-right-bottom"
-                        priority
-                    />
-                </div>
-            </motion.div>
-
-
-            {/* --- Main Content (High Z-Index) --- */}
-            <motion.div
-                className="relative z-20 text-center px-4 max-w-5xl mx-auto"
-                variants={textVariant}
-                initial="hidden"
-                animate="visible"
-            >
-                <p className="text-gold font-marcellus text-sm md:text-lg tracking-[0.3em] mb-6 uppercase">
-                    The Annual Cultural Fest of IET Lucknow
-                </p>
-
-                <h1 className="text-6xl md:text-9xl font-cinzel text-white mb-4 tracking-tight relative">
-                    ENCORE
-                    <span className="absolute -top-4 -right-6 md:-top-8 md:-right-12 text-2xl md:text-4xl text-gold font-script rotate-12">26</span>
-                </h1>
-
-
-                <h2 className="text-xl md:text-3xl font-cinzel text-gray-400 tracking-[0.2em] mb-8 md:mb-12">
-                    NAWABI ELEGANCE
-                </h2>
-
-                <div className="flex flex-col md:flex-row gap-6 justify-center items-center">
-                    <Link href={isLoggedIn ? "/dashboard" : "/login"}>
-                        <Button size="lg" className="w-48 text-lg bg-gold text-black border-gold hover:bg-gold/90 transition-all duration-300">
-                            {isLoggedIn ? "Dashboard" : "Register Now"}
-                        </Button>
-                    </Link>
-                    <Link href="/events">
-                        <Button variant="outline" size="lg" className="w-48 text-lg border-white/20 text-white hover:bg-white/10 transition-all duration-300">
-                            Explore Events
-                        </Button>
-                    </Link>
-                </div>
-            </motion.div>
+            </div>
         </section >
     );
 }

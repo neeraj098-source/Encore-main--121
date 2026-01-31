@@ -4,48 +4,39 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
-
+import { signIn } from 'next-auth/react';
+import { Lock, Mail } from 'lucide-react';
 
 export default function CAPortal() {
     const router = useRouter();
-    const [isLogin, setIsLogin] = useState(false);
-    const [formData, setFormData] = useState({ name: '', email: '', phone: '', college: '' });
+    const [formData, setFormData] = useState({ email: '', password: '' });
     const [loading, setLoading] = useState(false);
 
-    const handleAction = async (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
-        // For Login, we just check if user exists and is CA (Simplified logic for now)
-        // In real app, we'd have password auth. Here we trust email for demo/hackathon context or use generic login.
-
         try {
-            const endpoint = isLogin ? '/api/auth/login' : '/api/ca/register';
-            const res = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
+            const res = await signIn('credentials', {
+                redirect: false,
+                email: formData.email,
+                password: formData.password,
             });
 
-            if (res.ok) {
-                const data = await res.json();
-                if (isLogin && data.user.role !== 'CA') {
-                    alert('You are not registered as a Campus Ambassador');
-                    setLoading(false);
-                    return;
-                }
-                localStorage.setItem('encore_user', JSON.stringify(data.user));
-                // If registered, show success or redirect
-                if (!isLogin && data.code) {
-                    alert(`Registration Successful! Your Referral Code is: ${data.code}`);
-                }
-                router.push('/dashboard');
+            if (res?.error) {
+                alert('Invalid Credentials');
             } else {
-                const err = await res.json();
-                alert(err.message || err.error || 'Action failed');
+                // Check role (optional, but good for UX if we could. 
+                // Since signIn is opaque, we rely on dashboard to redirect if not CA, 
+                // or we can fetch user details after login)
+
+                // For now, assume success and redirect. 
+                // The dashboard should handle role-based content.
+                router.push('/dashboard');
             }
-        } catch {
-            alert('Connection Error');
+        } catch (error) {
+            console.error(error);
+            alert('Login failed');
         } finally {
             setLoading(false);
         }
@@ -64,67 +55,55 @@ export default function CAPortal() {
                 className="w-full max-w-md bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-2xl shadow-2xl relative z-10"
             >
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-cinzel text-gold mb-2">{isLogin ? 'CA Login' : 'CA Registration'}</h1>
-                    <p className="text-gray-400 font-marcellus text-sm">{isLogin ? 'Access your Ambassador Dashboard' : 'Join the Elite Envoys of Encore'}</p>
+                    <h1 className="text-3xl font-cinzel text-gold mb-2">CA Login</h1>
+                    <p className="text-gray-400 font-marcellus text-sm">Access your Ambassador Dashboard</p>
                 </div>
 
-                <form onSubmit={handleAction} className="space-y-4">
-                    {!isLogin && (
-                        <>
-                            <div className="space-y-2">
-                                <label className="text-sm font-marcellus text-gray-300">Full Name</label>
-                                <input
-                                    type="text"
-                                    required
-                                    className="w-full bg-black/40 border border-white/20 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-gold"
-                                    placeholder="Your Name"
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-marcellus text-gray-300">College / Institute</label>
-                                <input
-                                    type="text"
-                                    required
-                                    className="w-full bg-black/40 border border-white/20 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-gold"
-                                    placeholder="Institute Name"
-                                    value={formData.college}
-                                    onChange={(e) => setFormData({ ...formData, college: e.target.value })}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-marcellus text-gray-300">Phone Number</label>
-                                <input
-                                    type="tel"
-                                    className="w-full bg-black/40 border border-white/20 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-gold"
-                                    placeholder="+91 XXXXX XXXXX"
-                                    value={formData.phone}
-                                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                />
-                            </div>
-                        </>
-                    )}
+                <form onSubmit={handleLogin} className="space-y-6">
                     <div className="space-y-2">
                         <label className="text-sm font-marcellus text-gray-300">Email (Official)</label>
-                        <input
-                            type="email"
-                            required
-                            className="w-full bg-black/40 border border-white/20 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-gold"
-                            placeholder="email@example.com"
-                            value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        />
+                        <div className="relative">
+                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+                            <input
+                                type="email"
+                                required
+                                className="w-full bg-black/40 border border-white/20 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-gold"
+                                placeholder="email@example.com"
+                                value={formData.email}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            />
+                        </div>
                     </div>
 
-                    <Button type="submit" className="w-full py-6 text-lg" disabled={loading}>
-                        {loading ? 'Processing...' : (isLogin ? 'Login' : 'Register as CA')}
+                    <div className="space-y-2">
+                        <label className="text-sm font-marcellus text-gray-300">Password</label>
+                        <div className="relative">
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+                            <input
+                                type="password"
+                                required
+                                className="w-full bg-black/40 border border-white/20 rounded-xl py-3 pl-10 pr-4 text-white focus:outline-none focus:border-gold"
+                                placeholder="••••••••"
+                                value={formData.password}
+                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                            />
+                        </div>
+                    </div>
+
+                    <Button type="submit" className="w-full py-6 text-lg bg-gold text-black hover:bg-white transition-all" disabled={loading}>
+                        {loading ? 'Authenticating...' : 'Login'}
                     </Button>
                 </form>
 
-                <p className="text-xs text-center text-gray-500 mt-6 cursor-pointer hover:text-gold transition-colors" onClick={() => setIsLogin(!isLogin)}>
-                    {isLogin ? "Not a Campus Ambassador? Apply Now." : "Already have an account? Login."}
-                </p>
+                <div className="mt-6 text-center">
+                    <p className="text-xs text-gray-500 mb-2">
+                        Restricted Access. Registration is Closed.
+                    </p>
+                    <p className="text-xs text-gray-400">
+                        Want to become a Campus Ambassador? <br />
+                        <a href="mailto:encore@ietlucknow.ac.in" className="text-gold hover:underline">Contact the Team</a>
+                    </p>
+                </div>
             </motion.div>
         </main>
     );

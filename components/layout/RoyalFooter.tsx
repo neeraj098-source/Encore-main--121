@@ -41,7 +41,6 @@ export default function RoyalFooter() {
                             <li><Link href="/events" className="hover:text-gold transition-colors">Events</Link></li>
                             <li><Link href="/sponsorship" className="hover:text-gold transition-colors">Sponsors</Link></li>
                             <li><Link href="/about" className="hover:text-gold transition-colors">Our Team</Link></li>
-                            <li><Link href="/ca-portal" className="hover:text-gold transition-colors">CA Portal</Link></li>
                         </ul>
                     </div>
 

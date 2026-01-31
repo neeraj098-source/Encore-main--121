@@ -8,9 +8,19 @@ export default function Loader() {
     const videoRef = useRef<HTMLVideoElement>(null);
 
     useEffect(() => {
-        if (videoRef.current) {
-            videoRef.current.playbackRate = 2;
-        }
+        const playVideo = async () => {
+            if (videoRef.current) {
+                videoRef.current.playbackRate = 2;
+                try {
+                    await videoRef.current.play();
+                } catch (err) {
+                    console.log("Autoplay prevented:", err);
+                    // Force dismiss if autoplay literally fails (rare if muted)
+                    handleVideoEnded();
+                }
+            }
+        };
+        playVideo();
     }, []);
 
     useEffect(() => {

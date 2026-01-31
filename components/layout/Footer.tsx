@@ -50,7 +50,6 @@ export default function Footer() {
                             <li><Link href="/" className="text-gray-400 hover:text-gold transition-colors">Home</Link></li>
                             <li><Link href="/events" className="text-gray-400 hover:text-gold transition-colors">Events</Link></li>
                             <li><Link href="/sponsorship" className="text-gray-400 hover:text-gold transition-colors">Sponsors</Link></li>
-                            <li><Link href="/ca-portal" className="text-gray-400 hover:text-gold transition-colors">CA Portal</Link></li>
                         </ul>
                     </div>
 

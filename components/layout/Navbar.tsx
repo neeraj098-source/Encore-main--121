@@ -116,6 +116,7 @@ export default function Navbar() {
                                 <Link href="/ca-portal" className="hidden md:block text-xs font-marcellus tracking-widest hover:text-white transition-colors border-b border-transparent hover:border-[#D4AF37]">
                                     CA PORTAL
                                 </Link>
+
                                 <button onClick={() => setIsCartOpen(true)} className="relative hover:text-white transition-colors">
                                     <ShoppingCart size={20} />
                                     {cartCount > 0 && (
@@ -181,6 +182,7 @@ export default function Navbar() {
                         >
                             CA Portal
                         </Link>
+
                     </nav>
                 </div>
             )}

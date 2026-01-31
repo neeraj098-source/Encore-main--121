@@ -5,36 +5,33 @@ import Image from 'next/image';
 export default function SignatureNights() {
     const nights = [
         {
-            title: "MUSHAIRA",
-            subtitle: "A Night of Poetry",
-            image: "/images/event/poetry.png", // Using the generated image
+            title: "Revealing Soon",
+            subtitle: "Stay Tuned",
+            image: null, // Mystery
+            color: "from-gray-900 to-black",
             delay: 0
         },
         {
-            title: "BOLLYWOOD NIGHT",
-            subtitle: "Star Performance",
-            image: "/images/event/10.jpg", // Placeholder - check existing images
+            title: "Revealing Soon",
+            subtitle: "Stay Tuned",
+            image: null, // Mystery
+            color: "from-gray-900 to-black",
             delay: 0.2
         },
         {
-            title: "EDM NIGHT",
-            subtitle: "Electrifying Beats",
-            image: "/images/event/28.jpg",
+            title: "AJAY HUDA",
+            subtitle: "Live in Concert",
+            image: "/images/guests/ajay_huda.png",
+            // customBackground: "radial-gradient(circle at center, #785a28 0%, #3e2808 60%, #000000 100%)", // Rich gold/brown radial
+            customBackground: "radial-gradient(circle at 50% 30%, #6d4c41 0%, #3e2723 40%, #000000 100%)", // Warm sexy dark tone
             delay: 0.4
         }
     ];
 
     return (
         <section className="relative py-32 overflow-hidden">
-            {/* Global Background visible */}
-
             <div className="max-w-7xl mx-auto px-4">
-                <div
-                    className="text-center mb-24 relative"
-                >
-                    <div className="absolute left-1/2 -translate-x-1/2 -top-12 opacity-30">
-                        {/* Optional ornamental icon or flourishing could go here */}
-                    </div>
+                <div className="text-center mb-24 relative">
                     <h2 className="text-5xl md:text-7xl font-cinzel text-[#D4AF37] mb-6 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">SIGNATURE NIGHTS</h2>
                     <div className="flex items-center justify-center gap-4 mb-4">
                         <div className="h-[1px] w-12 bg-[#D4AF37]" />
@@ -47,22 +44,45 @@ export default function SignatureNights() {
                     {nights.map((night, index) => (
                         <div
                             key={index}
-                            className="group relative h-[500px] w-full overflow-hidden rounded-t-[10rem] border border-[#D4AF37]/30 bg-black/20 backdrop-blur-sm"
+                            className="group relative h-[600px] w-full overflow-hidden rounded-t-[10rem] border border-[#D4AF37]/30 bg-black/20 backdrop-blur-sm"
                         >
-                            <Image
-                                src={night.image}
-                                alt={night.title}
-                                fill
-                                className="object-cover transition-transform duration-1000 group-hover:scale-110 opacity-80 group-hover:opacity-100"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-500" />
+                            {/* Background Logic */}
+                            {night.image ? (
+                                <>
+                                    {/* Custom Background for Guest */}
+                                    <div
+                                        className="absolute inset-0 z-0"
+                                        style={{ background: night.customBackground || 'black' }}
+                                    />
+
+                                    {/* Gradient Pulse Effect for "Sexy" vibe */}
+                                    <div className="absolute inset-0 bg-gold/10 opacity-0 group-hover:opacity-20 transition-opacity duration-1000 z-0 mix-blend-overlay" />
+
+                                    <Image
+                                        src={night.image}
+                                        alt={night.title}
+                                        fill
+                                        className="object-cover object-top transition-transform duration-700 group-hover:scale-105 z-10"
+                                        sizes="(max-width: 768px) 100vw, 33vw"
+                                    />
+                                    {/* Bottom gradient fade for text legibility */}
+                                    <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-black via-black/60 to-transparent z-20" />
+                                </>
+                            ) : (
+                                /* Mystery Card Background */
+                                <div className={`absolute inset-0 bg-gradient-to-b ${night.color} flex items-center justify-center opacity-60`}>
+                                    <span className="text-6xl text-[#D4AF37]/20 font-cinzel">?</span>
+                                </div>
+                            )}
 
                             {/* Ornamental Arch Border */}
-                            <div className="absolute inset-0 border-[1px] border-[#D4AF37]/20 rounded-t-[10rem] m-2 pointer-events-none group-hover:border-[#D4AF37]/60 transition-colors duration-500" />
+                            <div className="absolute inset-0 border-[1px] border-[#D4AF37]/20 rounded-t-[10rem] m-2 pointer-events-none group-hover:border-[#D4AF37]/60 transition-colors duration-500 z-30" />
 
-                            <div className="absolute bottom-0 left-0 w-full p-8 translate-y-2 group-hover:translate-y-0 transition-transform duration-500 text-center">
-                                <h3 className="text-3xl font-cinzel text-white mb-3 drop-shadow-md">{night.title}</h3>
-                                <p className="text-[#FFD700] font-marcellus text-sm tracking-[0.2em] transform translate-y-4 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 delay-100 uppercase border-t border-[#FFD700]/30 pt-3 inline-block px-4">
+                            <div className="absolute bottom-0 left-0 w-full p-8 translate-y-2 group-hover:translate-y-0 transition-transform duration-500 text-center z-30">
+                                <h3 className="text-4xl font-cinzel text-white mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] tracking-wide">
+                                    {night.title}
+                                </h3>
+                                <p className="text-[#FFD700] font-marcellus text-sm tracking-[0.2em] uppercase border-t border-[#FFD700]/30 pt-3 inline-block px-4">
                                     {night.subtitle}
                                 </p>
                             </div>

@@ -1,7 +1,7 @@
 "use client";
 
 
-import { Instagram, Youtube, MapPin, Calendar } from 'lucide-react';
+import { Instagram, Youtube, MapPin, Calendar, Linkedin } from 'lucide-react';
 
 export default function TopBar() {
     return (
@@ -31,8 +31,10 @@ export default function TopBar() {
                     <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors duration-300">
                         <Youtube className="w-4 h-4" />
                     </a>
+                    <a href="https://www.linkedin.com/school/ietlucknow/posts/?feedView=all" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors duration-300">
+                        <Linkedin className="w-4 h-4" />
+                    </a>
                 </div>
             </div>
-        </div>
-    );
+        </div>);
 }

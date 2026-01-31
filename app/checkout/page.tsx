@@ -142,6 +142,32 @@ export default function CheckoutPage() {
         </div>
     );
 
+    const PAYMENTS_ENABLED = false;
+
+    if (!PAYMENTS_ENABLED) {
+        return (
+            <div className="min-h-screen bg-[#050505] pt-28 pb-12 px-4 font-sans text-gray-200 bg-[url('/images/noise.png')] flex items-center justify-center">
+                <div className="max-w-md w-full bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-md text-center">
+                    <div className="w-16 h-16 bg-gold/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-gold/30">
+                        <ShieldCheck className="text-gold" size={32} />
+                    </div>
+                    <h1 className="text-3xl font-cinzel text-white mb-4">Payments Disabled</h1>
+                    <p className="text-gray-400 mb-8 font-marcellus leading-relaxed">
+                        Payments are temporarily disabled. <br />
+                        <span className="text-gold">Complete your registration now.</span> <br />
+                        Payment will be collected at a later stage.
+                    </p>
+                    <Button
+                        onClick={() => router.push('/')}
+                        className="w-full bg-gold text-black hover:bg-yellow-600 font-bold h-12 uppercase tracking-widest"
+                    >
+                        Return to Home
+                    </Button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-[#050505] pt-28 pb-12 px-4 font-sans text-gray-200 bg-[url('/images/noise.png')]">
             <Modal

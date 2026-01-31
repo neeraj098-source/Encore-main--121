@@ -51,15 +51,25 @@ export async function PUT(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        // Whitelist allowed fields for Admin Update
+        const allowedFields = [
+            'name', 'email', 'phone', 'college', 'year', 'accommodation',
+            'role', 'paymentVerified', 'profileCompleted', 'referralCode'
+        ];
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const data: any = { ...updates };
+        const data: any = {};
+
+        for (const key of allowedFields) {
+            if (key in updates) {
+                data[key] = updates[key];
+            }
+        }
 
         // Handle Password Reset
         if (password && password.trim() !== "") {
-
             const hashedPassword = await bcrypt.hash(password, 10);
             data.password = hashedPassword;
-
         }
 
         const updatedUser = await prisma.user.update({

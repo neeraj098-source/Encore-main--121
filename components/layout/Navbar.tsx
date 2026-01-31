@@ -42,11 +42,13 @@ export default function Navbar() {
         window.addEventListener('storage', checkLogin);
         window.addEventListener('user-login', checkLogin);
         window.addEventListener('cart-updated', updateCartCount);
+        window.addEventListener('open-cart', () => setIsCartOpen(true));
 
         return () => {
             window.removeEventListener('storage', checkLogin);
             window.removeEventListener('user-login', checkLogin);
             window.removeEventListener('cart-updated', updateCartCount);
+            window.removeEventListener('open-cart', () => setIsCartOpen(true));
         };
     }, []);
 
@@ -69,20 +71,22 @@ export default function Navbar() {
 
     return (
         <>
+            <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+
             {/* ROYAL FLOATING NAVBAR */}
             <motion.header
-                className="fixed top-6 left-1/2 z-50 w-[95%] max-w-5xl"
-                initial={{ x: "-50%", y: 0 }}
+                className="fixed top-6 left-1/2 z-50 w-[95%] max-w-6xl"
+                initial={{ x: "-50%", y: -100, opacity: 0 }}
                 animate={{
                     x: "-50%",
-                    y: isCurtainDown ? 0 : -150
+                    y: 0,
+                    opacity: 1
                 }}
-                transition={{ duration: 0.5, ease: "easeInOut" }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
             >
-                <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
-
                 {/* Main Container - Floating Pill */}
-                <div className="relative w-full bg-[#050505] border border-[#D4AF37]/20 shadow-[0_0_20px_rgba(0,0,0,0.9)] px-6 py-3 rounded-full">
+                <div className={`relative w-full border border-[#D4AF37]/20 shadow-[0_0_20px_rgba(0,0,0,0.9)] px-6 py-3 rounded-full transition-all duration-500 ${pathname === '/' && isCurtainDown ? 'bg-black/30 backdrop-blur-sm' : 'bg-[#050505]'
+                    }`}>
 
                     {/* Inner Gold Frame Border */}
                     <div className="absolute inset-1 rounded-full border border-[#D4AF37]/10 pointer-events-none" />
@@ -96,7 +100,7 @@ export default function Navbar() {
                                 {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
                             </button>
 
-                            {/* Desktop Links - All on Left */}
+                            {/* Desktop Links */}
                             <nav className="hidden md:flex items-center gap-8">
                                 <Link href="/" className="text-[#E8E1CF] hover:text-[#D4AF37] font-cinzel tracking-wider text-sm transition-colors uppercase">Home</Link>
                                 <Link href="/events" className="text-[#E8E1CF] hover:text-[#D4AF37] font-cinzel tracking-wider text-sm transition-colors uppercase">Events</Link>
@@ -105,25 +109,25 @@ export default function Navbar() {
                             </nav>
                         </div>
 
-                        {/* RIGHT: Actions + Logo */}
+                        {/* RIGHT: Actions + Divider + Logo */}
                         <div className="flex items-center gap-6 pr-4">
-
                             {/* Actions (CA, Cart, User) */}
                             <div className="flex items-center gap-5 text-[#D4AF37]">
                                 <Link href="/ca-portal" className="hidden md:block text-xs font-marcellus tracking-widest hover:text-white transition-colors border-b border-transparent hover:border-[#D4AF37]">
                                     CA PORTAL
                                 </Link>
                                 <button onClick={() => setIsCartOpen(true)} className="relative hover:text-white transition-colors">
-                                    <ShoppingCart size={18} />
+                                    <ShoppingCart size={20} />
                                     {cartCount > 0 && (
                                         <span className="absolute -top-1.5 -right-1.5 w-1.5 h-1.5 bg-red-500 rounded-full shadow-[0_0_5px_red]" />
                                     )}
                                 </button>
                                 <Link href={isLoggedIn ? "/dashboard" : "/login"} className="hover:text-white transition-colors">
-                                    <User size={18} />
+                                    <User size={20} />
                                 </Link>
                             </div>
 
+                            {/* Vertical Divider */}
                             <div className="h-8 w-[1px] bg-[#D4AF37]/30 hidden md:block" />
 
                             {/* Logo */}

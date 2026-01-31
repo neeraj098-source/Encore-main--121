@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Instagram, Youtube, Mail, MapPin, Phone, Facebook, Twitter } from 'lucide-react';
+import { Instagram, Youtube, Mail, MapPin, Phone, Facebook, Twitter, Linkedin } from 'lucide-react';
 
 
 export default function RoyalFooter() {
@@ -82,6 +82,9 @@ export default function RoyalFooter() {
                             </a>
                             <a href="#" className="w-10 h-10 rounded-full border border-gold/30 flex items-center justify-center text-gold hover:bg-gold hover:text-black transition-all duration-300">
                                 <Youtube size={18} />
+                            </a>
+                            <a href="https://www.linkedin.com/school/ietlucknow/posts/?feedView=all" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-gold/30 flex items-center justify-center text-gold hover:bg-gold hover:text-black transition-all duration-300">
+                                <Linkedin size={18} />
                             </a>
                         </div>
                     </div>

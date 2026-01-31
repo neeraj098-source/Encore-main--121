@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function POST(request: Request) {
     try {
@@ -25,9 +23,20 @@ export async function POST(request: Request) {
         // Generate Referral Code (Random 5-digit number)
         const code = Math.floor(10000 + Math.random() * 90000).toString();
 
+        // Generate Unique 6-Digit ID
+        let newId = '';
+        let isUniqueId = false;
+        while (!isUniqueId) {
+            newId = Math.floor(100000 + Math.random() * 900000).toString();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const existingId = await prisma.user.findUnique({ where: { id: newId } });
+            if (!existingId) isUniqueId = true;
+        }
+
         // Create CA User
         const newCA = await prisma.user.create({
             data: {
+                id: newId,
                 name,
                 email,
                 phone,

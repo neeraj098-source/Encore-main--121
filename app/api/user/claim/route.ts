@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function POST(request: Request) {
     try {
@@ -11,66 +9,71 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing Data' }, { status: 400 });
         }
 
-        const user = await prisma.user.findUnique({
-            where: { email }
-        });
+        const result = await prisma.$transaction(async (tx) => {
+            // Cart Verification inside transaction
+            if (task.startsWith('taskCart')) {
+                const userWithCart = await tx.user.findUnique({
+                    where: { email },
+                    include: { cart: { include: { items: true } } }
+                });
 
-        if (!user) {
-            return NextResponse.json({ error: 'User Not Found' }, { status: 404 });
-        }
+                if (!userWithCart) throw new Error('User Not Found');
 
-        // Check if already claimed
-        // Type assertion to allow dynamic key access on known fields
-        const userTyped = user as unknown as Record<string, unknown>;
-        if (userTyped[task]) {
-            return NextResponse.json({ error: 'Reward already claimed!' }, { status: 400 });
-        }
+                const cartCount = userWithCart.cart?.items.length || 0;
+                let required = 3;
+                if (task === 'taskCart5') required = 5;
+                if (task === 'taskCart10') required = 10;
 
-        const validTasks = ['taskInsta', 'taskLinkedIn', 'taskX', 'taskFacebook', 'taskCart', 'taskCart5', 'taskCart10'];
-        if (!validTasks.includes(task)) {
-            return NextResponse.json({ error: 'Invalid Task' }, { status: 400 });
-        }
-
-        // Special Verification for Cart Quest
-        if (task.startsWith('taskCart')) {
-            const userWithCart = await prisma.user.findUnique({
-                where: { email },
-                include: { cart: { include: { items: true } } }
-            });
-
-            const cartCount = userWithCart?.cart?.items.length || 0;
-            let required = 3;
-            if (task === 'taskCart5') required = 5;
-            if (task === 'taskCart10') required = 10;
-
-            if (cartCount < required) {
-                return NextResponse.json({ error: `You need ${required - cartCount} more events in cart!` }, { status: 400 });
-            }
-        }
-
-        // Award Coins
-        let REWARD_AMOUNT = 50;
-        if (task === 'taskCart5') REWARD_AMOUNT = 100;
-        if (task === 'taskCart10') REWARD_AMOUNT = 150;
-
-        await prisma.user.update({
-            where: { email },
-            data: {
-                [task]: true,
-                caCoins: { increment: REWARD_AMOUNT },
-                coinHistory: {
-                    create: {
-                        amount: REWARD_AMOUNT,
-                        reason: `Completed Task: ${task}`
-                    }
+                if (cartCount < required) {
+                    throw new Error(`You need ${required - cartCount} more events in cart!`);
                 }
             }
+
+            // Award Coins
+            let reward = 50;
+            if (task === 'taskCart5') reward = 100;
+            if (task === 'taskCart10') reward = 150;
+
+            // Atomic Update: Only update if the task is currently false
+            const updateResult = await tx.user.updateMany({
+                where: {
+                    email,
+                    [task]: false // ATOMIC GUARD
+                },
+                data: {
+                    [task]: true,
+                    caCoins: { increment: reward },
+                }
+            });
+
+            if (updateResult.count === 0) {
+                // Check if user exists to give better error
+                const userExists = await tx.user.findUnique({ where: { email } });
+                if (!userExists) throw new Error('User Not Found');
+
+                // If user exists, it means task was already true
+                throw new Error('Reward already claimed!');
+            }
+
+            // Create History (Since updateMany doesn't support nested writes)
+            await tx.coinHistory.create({
+                data: {
+                    user: { connect: { email } },
+                    amount: reward,
+                    reason: `Completed Task: ${task}`
+                }
+            });
+
+            // Fetch final balance to return
+            const finalUser = await tx.user.findUnique({ where: { email } });
+
+            return { coins: finalUser?.caCoins || 0, reward };
         });
 
         return NextResponse.json({
             success: true,
-            coins: user.caCoins + REWARD_AMOUNT,
-            message: `You earned ${REWARD_AMOUNT} coins!`
+            coins: result.coins,
+            message: `You earned ${result.reward} coins!`
         }, { status: 200 });
 
     } catch (error) {

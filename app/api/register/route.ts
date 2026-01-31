@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
-
-const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
     try {
@@ -14,71 +12,77 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Name and Email are required' }, { status: 400 });
         }
 
-        // Check if user exists
-        const existingUser = await prisma.user.findUnique({
-            where: { email },
-        });
-
-        if (existingUser) {
-            return NextResponse.json({
-                message: 'User already exists',
-                user: existingUser,
-                exists: true
-            }, { status: 200 });
-        }
-
-        // Handle Referral
-        let referrerId = null;
-        if (referralCode) {
-            const referrer = await prisma.user.findUnique({
-                where: { referralCode: referralCode }
+        const { newUser, referrerId } = await prisma.$transaction(async (tx) => {
+            // Check if user exists (inside tx lock)
+            const existingUser = await tx.user.findUnique({
+                where: { email },
             });
 
-            if (referrer) {
-                // Increment referrer's coin count (e.g., +50 coins)
-                await prisma.user.update({
-                    where: { id: referrer.id },
-                    data: {
-                        caCoins: { increment: 50 },
-                        coinHistory: {
-                            create: {
-                                amount: 50,
-                                reason: `Referral Bonus: User Registration`
+            if (existingUser) {
+                // Throwing error to abort transaction
+                throw new Error('User already exists');
+            }
+
+            // Handle Referral
+            let refId = null;
+            if (referralCode) {
+                const referrer = await tx.user.findUnique({
+                    where: { referralCode: referralCode }
+                });
+
+                if (referrer) {
+                    await tx.user.update({
+                        where: { id: referrer.id },
+                        data: {
+                            caCoins: { increment: 50 },
+                            coinHistory: {
+                                create: {
+                                    amount: 50,
+                                    reason: `Referral Bonus: User Registration`
+                                }
                             }
                         }
-                    }
-                });
-                referrerId = referralCode;
+                    });
+                    refId = referralCode;
+                }
             }
-        }
 
-        // Hash Password if provided
-        let hashedPassword = null;
-        if (password) {
-            hashedPassword = await bcrypt.hash(password.trim(), 10);
-        }
+            // Hash Password
+            let hashedPassword = null;
+            if (password) {
+                hashedPassword = await bcrypt.hash(password.trim(), 10);
+            }
 
-        // Create new user
-        const newUser = await prisma.user.create({
-            data: {
-                name,
-                email,
+            // Generate Unique 6-Digit ID
+            let newId = '';
+            let isUniqueId = false;
+            while (!isUniqueId) {
+                newId = Math.floor(100000 + Math.random() * 900000).toString();
+                const existingId = await tx.user.findUnique({ where: { id: newId } });
+                if (!existingId) isUniqueId = true;
+            }
 
-                password: hashedPassword,
+            // Create new user
+            const createdUser = await tx.user.create({
+                data: {
+                    id: newId,
+                    name,
+                    email,
+                    password: hashedPassword,
+                    gender,
+                    phone,
+                    college,
+                    year,
+                    accommodation,
+                    paymentId,
+                    paymentScreenshot: body.paymentScreenshot,
+                    totalPaid: body.totalPaid || (accommodation === 'yes' ? 999 : 399),
+                    paymentVerified: false,
+                    referredBy: refId
+                },
+            });
 
-                gender,
-                phone,
-                college,
-                year,
-                accommodation,
-                paymentId,
-
-                paymentScreenshot: body.paymentScreenshot,
-
-                totalPaid: body.totalPaid || (accommodation === 'yes' ? 999 : 399),
-                paymentVerified: false, // Always false until Admin approves
-                referredBy: referrerId
-            },
+            return { newUser: createdUser, referrerId: refId };
         });
 
         return NextResponse.json({

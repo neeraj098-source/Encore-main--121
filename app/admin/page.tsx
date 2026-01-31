@@ -17,6 +17,7 @@ interface Order {
     status: string;
     totalAmount: number;
     items: OrderItem[];
+    passType?: string; // Added to interface
 }
 
 interface CoinEntry {
@@ -341,19 +342,16 @@ export default function AdminPanel() {
                                     <p className="text-xs text-gray-400 uppercase tracking-widest mb-1">Total Verified</p>
                                     <p className="text-4xl font-mono text-gold mb-1">
                                         ₹{
-                                            (verifyingUser.paymentVerified ? (verifyingUser.totalPaid || (verifyingUser.accommodation === 'yes' ? 999 : 399)) : 0) +
-                                            (verifyingUser.orders?.reduce((sum: number, order) => order.status === 'PAID' ? sum + order.totalAmount : sum, 0) || 0)
+                                            verifyingUser.orders?.reduce((sum: number, order) => order.status === 'PAID' ? sum + order.totalAmount : sum, 0) || 0
                                         }
                                     </p>
 
                                     {/* Show Pending if any */}
-                                    {((!verifyingUser.paymentVerified ? (verifyingUser.totalPaid || (verifyingUser.accommodation === 'yes' ? 999 : 399)) : 0) +
-                                        (verifyingUser.orders?.reduce((sum: number, order) => order.status !== 'PAID' ? sum + order.totalAmount : sum, 0) || 0)) > 0 && (
-                                            <p className="text-xs text-red-400 font-mono mb-2">
-                                                + ₹{((!verifyingUser.paymentVerified ? (verifyingUser.totalPaid || (verifyingUser.accommodation === 'yes' ? 999 : 399)) : 0) +
-                                                    (verifyingUser.orders?.reduce((sum: number, order) => order.status !== 'PAID' ? sum + order.totalAmount : sum, 0) || 0))} Pending
-                                            </p>
-                                        )}
+                                    {(verifyingUser.orders?.reduce((sum: number, order) => order.status !== 'PAID' ? sum + order.totalAmount : sum, 0) || 0) > 0 && (
+                                        <p className="text-xs text-red-400 font-mono mb-2">
+                                            + ₹{verifyingUser.orders?.reduce((sum: number, order) => order.status !== 'PAID' ? sum + order.totalAmount : sum, 0) || 0} Pending
+                                        </p>
+                                    )}
 
                                     {verifyingUser.paymentVerified ? (
                                         <span className="text-xs text-green-400 bg-green-900/20 border border-green-500/30 px-3 py-1 rounded uppercase tracking-widest font-bold">Verified</span>
@@ -363,16 +361,24 @@ export default function AdminPanel() {
                                 </div>
                             </div>
 
-                            {/* 1. Fest Pass Details */}
+                            {/* 1. Fest Pass Details - Updated to reflect it is part of orders now */}
                             <div className="bg-[#151515] p-5 rounded-lg border border-white/10 relative overflow-hidden group">
                                 <div className="absolute top-0 left-0 w-1 h-full bg-gold" />
-                                <h4 className="text-gold font-cinzel text-sm mb-4 uppercase tracking-wider">Fest Pass</h4>
+                                <h4 className="text-gold font-cinzel text-sm mb-4 uppercase tracking-wider">Fest Pass Status</h4>
                                 <div className="flex justify-between items-center">
                                     <div>
-                                        <p className="text-xl text-white font-cinzel mb-1">{verifyingUser.accommodation === 'yes' ? 'Accommodation Pass' : 'Basic Pass'}</p>
-                                        <p className="text-xs text-gray-500 uppercase tracking-widest">{verifyingUser.accommodation === 'yes' ? 'Includes 3-Day Stay + Entry' : 'Entry Only'}</p>
+                                        <p className="text-xl text-white font-cinzel mb-1">
+                                            {verifyingUser.orders?.some(o => o.passType) ? (
+                                                verifyingUser.orders.find(o => o.passType)?.passType === 'accommodation' ? 'Accommodation Pass' : 'Basic Pass'
+                                            ) : (verifyingUser.accommodation === 'yes' ? 'Legacy Accommodation' : 'Legacy/Standby')}
+                                        </p>
+                                        <p className="text-xs text-gray-500 uppercase tracking-widest">
+                                            {verifyingUser.orders?.some(o => o.passType) ? 'Linked to Order' : 'Check Orders Below'}
+                                        </p>
                                     </div>
-                                    <span className="text-2xl font-mono text-white">₹{verifyingUser.accommodation === 'yes' ? 999 : 399}</span>
+                                    <span className="text-lg font-mono text-gray-400">
+                                        {verifyingUser.orders?.some(o => o.passType) ? 'Included in Order Total' : 'N/A'}
+                                    </span>
                                 </div>
                             </div>
 
@@ -598,8 +604,9 @@ export default function AdminPanel() {
                                 }).map((user) => {
 
 
-                                    // Registration Fee Logic
-                                    const registrationFee = user.totalPaid || (user.accommodation === 'yes' ? 999 : 399);
+                                    // Registration Fee Logic - Single Source of Truth: ORDERS
+                                    const totalOrdersValue = user.orders?.reduce((sum, order) => sum + order.totalAmount, 0) || 0;
+                                    const hasPendingOrders = user.orders?.some(o => o.status !== 'PAID');
 
                                     return (
                                         <tr key={user.id} className="hover:bg-white/5">
@@ -619,12 +626,13 @@ export default function AdminPanel() {
                                             {/* Payment & Verification Status */}
                                             <td className="p-4">
                                                 <div className="flex flex-col gap-1">
-                                                    <span className="text-gold font-mono text-sm">₹{registrationFee}</span>
+                                                    <span className="text-gold font-mono text-sm">₹{totalOrdersValue}</span>
                                                     {user.paymentVerified ? (
                                                         <span className="text-xs text-green-400 bg-green-900/20 px-2 py-0.5 rounded w-fit">Verified</span>
                                                     ) : (
                                                         <div className="flex items-center gap-2">
-                                                            <span className="text-xs text-red-400 bg-red-900/20 px-2 py-0.5 rounded">Pending</span>
+                                                            {hasPendingOrders && <span className="text-xs text-yellow-500 bg-yellow-900/20 px-2 py-0.5 rounded">Pending Orders</span>}
+                                                            {!user.paymentVerified && !hasPendingOrders && <span className="text-xs text-gray-500">No Orders</span>}
                                                             <button
                                                                 onClick={() => openVerifyModal(user)}
                                                                 className="text-[10px] bg-green-600/20 text-green-400 border border-green-600/50 px-2 rounded hover:bg-green-600/30 transition-colors"

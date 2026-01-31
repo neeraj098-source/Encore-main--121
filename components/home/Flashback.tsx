@@ -37,7 +37,7 @@ export default function Flashback() {
             {/* Background Vibe - Enhanced blending */}
             <div className="absolute inset-0 opacity-10 pointer-events-none mix-blend-overlay">
                 <Image
-                    src="/images/crowd.png"
+                    src="/images/home/party_crowd.png"
                     alt="Crowd background"
                     fill
                     className="object-cover"

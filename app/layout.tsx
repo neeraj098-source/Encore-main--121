@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Cinzel, Marcellus } from "next/font/google";
-import Navbar from "@/components/layout/Navbar";
 import RoyalFooter from "@/components/layout/RoyalFooter";
+import ClientLayout from "@/components/layout/ClientLayout";
 import Loader from "@/components/ui/Loader";
 import Particles from "@/components/ui/Particles";
 import CinematicBackground from "@/components/ui/CinematicBackground";
@@ -63,10 +63,9 @@ export default function RootLayout({
         {/* Previous background elements removed in favor of the unified component */}
 
         <Loader />
-        <Navbar />
-        <main className="relative pt-24">
+        <ClientLayout>
           {children}
-        </main>
+        </ClientLayout>
         <RoyalFooter />
       </body>
     </html>

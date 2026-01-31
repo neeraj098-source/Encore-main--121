@@ -154,11 +154,16 @@ export default function CartPage() {
                                 </div>
                             </div>
 
+                            <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg mb-2">
+                                <p className="text-yellow-500 text-xs text-center font-bold">
+                                    PAYMENT TEMPORARILY DISABLED
+                                </p>
+                            </div>
                             <button
-                                onClick={() => router.push("/checkout")}
-                                className="w-full py-3 bg-gradient-to-r from-gold to-yellow-600 text-black font-bold rounded-lg hover:scale-[1.02] transition-transform flex items-center justify-center gap-2 shadow-lg shadow-gold/20"
+                                disabled
+                                className="w-full py-3 bg-gray-700 text-gray-400 font-bold rounded-lg flex items-center justify-center gap-2 cursor-not-allowed opacity-50"
                             >
-                                Proceed to Buy
+                                Payments Coming Soon
                                 <ArrowRight size={20} />
                             </button>
                         </div>

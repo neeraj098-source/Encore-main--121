@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import CountdownTimer from "./CountdownTimer";
 
 export default function RegistrationPopup() {
     const [isOpen, setIsOpen] = useState(false);
@@ -84,12 +85,15 @@ export default function RegistrationPopup() {
                                     transition={{ delay: 0.5, type: "spring" }}
                                     className="mb-6 relative"
                                 >
-                                    <h2 className="text-6xl md:text-8xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-[#F9E29C] via-[#D4AF37] to-[#AA8C2C] drop-shadow-[0_2px_10px_rgba(212,175,55,0.5)]">
+                                    {/* <h2 className="text-6xl md:text-8xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-[#F9E29C] via-[#D4AF37] to-[#AA8C2C] drop-shadow-[0_2px_10px_rgba(212,175,55,0.5)]">
                                         7
                                     </h2>
                                     <p className="text-2xl md:text-3xl text-white mt-[-10px] tracking-widest font-bold drop-shadow-md">
                                         DAYS
-                                    </p>
+                                    </p> */}
+                                    <div className="scale-75 origin-center -my-2">
+                                        <CountdownTimer targetDate="2026-02-08T00:00:00" />
+                                    </div>
                                     <p className="text-sm text-[#D4AF37]/80 mt-1 uppercase tracking-widest">
                                         League Of Legacy
                                     </p>

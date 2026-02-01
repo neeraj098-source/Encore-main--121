@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import Image from 'next/image';
-import CountdownTimer from '../ui/CountdownTimer';
+
 
 
 export default function Hero() {
@@ -113,7 +113,7 @@ export default function Hero() {
                 {/* Text Vignette - subtle blending layer */}
                 <div className="absolute inset-0 bg-radial-gradient from-black/0 via-black/0 to-black/40 blur-3xl -z-10 scale-150" />
 
-                <CountdownTimer targetDate="2026-02-08T00:00:00" />
+
 
                 <p className="text-[#D4AF37] font-marcellus text-sm md:text-xl tracking-[0.4em] mb-8 uppercase drop-shadow-md">
                     The Annual Cultural Fest of IET Lucknow

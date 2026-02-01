@@ -19,7 +19,7 @@ export default function SignatureNights() {
             delay: 0.2
         },
         {
-            title: "AJAY HUDA",
+            title: "AJAY HOODA",
             subtitle: "Live in Concert",
             image: "/images/guests/ajay_huda.png",
             // customBackground: "radial-gradient(circle at center, #785a28 0%, #3e2808 60%, #000000 100%)", // Rich gold/brown radial

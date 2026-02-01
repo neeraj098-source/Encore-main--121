@@ -7,6 +7,7 @@ import Particles from "@/components/ui/Particles";
 import CinematicBackground from "@/components/ui/CinematicBackground";
 import CinematicLightingOverlay from "@/components/ui/CinematicLightingOverlay";
 import CornerCurtains from "@/components/ui/CornerCurtains";
+import RegistrationPopup from "@/components/ui/RegistrationPopup";
 import "./globals.css";
 
 const cinzel = Cinzel({
@@ -59,6 +60,7 @@ export default function RootLayout({
         <CinematicBackground />
         <CinematicLightingOverlay />
         <CornerCurtains />
+        <RegistrationPopup />
 
         {/* Previous background elements removed in favor of the unified component */}
 

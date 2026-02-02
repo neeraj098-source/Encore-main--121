@@ -1,11 +1,16 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { sendVerificationEmail } from "@/lib/email";
+import crypto from "crypto";
 
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { name, email, phone, college, year, accommodation, paymentId, password, gender, referralCode } = body;
+        let { name, email, phone, college, year, accommodation, password, gender, referralCode } = body;
+
+        // Normalize email
+        email = email ? email.toLowerCase() : email;
 
         // Basic validation
         if (!name || !email) {
@@ -62,7 +67,11 @@ export async function POST(request: Request) {
                 if (!existingId) isUniqueId = true;
             }
 
+            // Generate Verification Token
+            const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+
             // Generate Referral Code for User (6-digit)
+            // MERGED FROM MAIN branch logic
             let newReferralCode = '';
             let isUniqueCode = false;
             while (!isUniqueCode) {
@@ -83,10 +92,17 @@ export async function POST(request: Request) {
                     college,
                     year,
                     accommodation,
-                    paymentId,
-                    paymentScreenshot: body.paymentScreenshot,
-                    totalPaid: body.totalPaid || (accommodation === 'yes' ? 999 : 399),
+                    // Payment fields defaults
+                    paymentId: null,
+                    paymentScreenshot: null,
+                    totalPaid: 0,
                     paymentVerified: false,
+
+                    // Verification (New Feature)
+                    emailVerified: false,
+                    emailVerificationToken,
+
+                    // Referral (Existing Feature)
                     referredBy: refId,
                     referralCode: newReferralCode
                 },
@@ -95,14 +111,19 @@ export async function POST(request: Request) {
             return { newUser: createdUser, referrerId: refId };
         });
 
+        // Send Verification Email
+        if (newUser.emailVerificationToken) {
+            await sendVerificationEmail(newUser.email, newUser.emailVerificationToken);
+        }
+
         return NextResponse.json({
-            message: 'Registration successful',
+            message: 'Registration successful. Please check your email to verify your account.',
             user: newUser,
             exists: false
         }, { status: 201 });
 
     } catch (error) {
-        console.error('Registration Error Details:', error); // Changed log message
+        console.error('Registration Error Details:', error);
         return NextResponse.json({ error: 'Internal Server Error', details: (error as Error).message }, { status: 500 });
     }
 }

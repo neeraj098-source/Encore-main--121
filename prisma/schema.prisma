@@ -26,6 +26,9 @@ model User {
 
   paymentVerified Boolean  @default(false)
   profileCompleted Boolean @default(false)
+
+  emailVerified       Boolean  @default(false)
+  emailVerificationToken String?
   
   // CA Fields
   role            String   @default("USER") // USER or CA

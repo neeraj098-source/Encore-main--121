@@ -1,11 +1,16 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { sendVerificationEmail } from "@/lib/email";
+import crypto from "crypto";
 
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { name, email, phone, college, year, accommodation, paymentId, password, gender, referralCode } = body;
+        let { name, email, phone, college, year, accommodation, password, gender, referralCode } = body;
+
+        // Normalize email
+        email = email ? email.toLowerCase() : email;
 
         // Basic validation
         if (!name || !email) {
@@ -62,6 +67,9 @@ export async function POST(request: Request) {
                 if (!existingId) isUniqueId = true;
             }
 
+            // Generate Verification Token
+            const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+
             // Create new user
             const createdUser = await tx.user.create({
                 data: {
@@ -74,10 +82,16 @@ export async function POST(request: Request) {
                     college,
                     year,
                     accommodation,
-                    paymentId,
-                    paymentScreenshot: body.paymentScreenshot,
-                    totalPaid: body.totalPaid || (accommodation === 'yes' ? 999 : 399),
+                    // Payment fields defaults
+                    paymentId: null,
+                    paymentScreenshot: null,
+                    totalPaid: 0,
                     paymentVerified: false,
+
+                    // Verification
+                    emailVerified: false,
+                    emailVerificationToken,
+
                     referredBy: refId
                 },
             });
@@ -85,8 +99,13 @@ export async function POST(request: Request) {
             return { newUser: createdUser, referrerId: refId };
         });
 
+        // Send Verification Email
+        if (newUser.emailVerificationToken) {
+            await sendVerificationEmail(newUser.email, newUser.emailVerificationToken);
+        }
+
         return NextResponse.json({
-            message: 'Registration successful',
+            message: 'Registration successful. Please check your email to verify your account.',
             user: newUser,
             exists: false
         }, { status: 201 });

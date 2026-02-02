@@ -77,7 +77,7 @@ export default function LoginForm() {
         try {
             const res = await signIn('credentials', {
                 redirect: false,
-                email: loginData.email.trim(),
+                email: loginData.email.trim().toLowerCase(),
                 password: loginData.password.trim(),
             });
 
@@ -151,7 +151,7 @@ export default function LoginForm() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...formData,
-                    email: formData.email.trim(),
+                    email: formData.email.trim().toLowerCase(),
                     password: formData.password.trim(),
                     confirmPassword: formData.confirmPassword.trim(),
                     // paymentId: paymentState.paymentId.trim(),
@@ -178,8 +178,8 @@ export default function LoginForm() {
                 } else {
                     setModalState({
                         isOpen: true,
-                        title: "Success",
-                        message: "Registration Successful! Please login with your credentials.",
+                        title: "Check Your Email",
+                        message: "Registration Successful! Please check your email to verify your account before logging in.",
                         type: "success",
                         onAction: () => {
                             setIsLoginMode(true);
@@ -443,16 +443,17 @@ export default function LoginForm() {
                                 <div className="space-y-2">
                                     <label className="text-xs text-gray-400 ml-1">Accommodation*</label>
                                     <div className="grid grid-cols-2 gap-4">
+
                                         <button type="button" onClick={() => handleChange('accommodation', 'yes')} className={`p-4 rounded-lg border transition-all ${formData.accommodation === 'yes' ? 'bg-gold/20 border-gold text-white' : 'border-white/10 text-gray-400 hover:border-white/30'}`}>
                                             <div className="flex flex-col items-center">
                                                 <span className="font-marcellus text-lg mb-1">Yes</span>
-                                                <span className="text-sm font-bold text-red-500 bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20">PAID ₹999</span>
+                                                <span className="text-sm text-gray-400">With Accommodation</span>
                                             </div>
                                         </button>
                                         <button type="button" onClick={() => handleChange('accommodation', 'no')} className={`p-4 rounded-lg border transition-all ${formData.accommodation === 'no' ? 'bg-gold/20 border-gold text-white' : 'border-white/10 text-gray-400 hover:border-white/30'}`}>
                                             <div className="flex flex-col items-center">
                                                 <span className="font-marcellus text-lg mb-1">No</span>
-                                                <span className="text-sm font-bold text-gray-300 bg-white/10 px-2 py-0.5 rounded border border-white/10">LOCAL ₹399</span>
+                                                <span className="text-sm text-gray-400">Without Accommodation</span>
                                             </div>
                                         </button>
                                     </div>

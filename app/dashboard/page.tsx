@@ -265,7 +265,7 @@ export default function Dashboard() {
                         </div>
 
                         {/* Team Manager Widget */}
-                        <TeamManager userEmail={user.email} />
+                        <TeamManager userEmail={user.email} userId={user.id} />
 
                         {/* Nawabi Coins Info Card */}
                         <div className="bg-gradient-to-r from-purple-900/40 to-black p-6 rounded-2xl border border-purple-500/30 relative overflow-hidden">

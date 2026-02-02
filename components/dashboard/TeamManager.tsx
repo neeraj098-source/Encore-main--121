@@ -11,10 +11,11 @@ interface Team {
     code: string;
     eventSlug: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     members: any[];
 }
 
-export default function TeamManager({ userEmail }: { userEmail: string }) {
+export default function TeamManager({ userEmail, userId }: { userEmail: string, userId: string }) {
     const [teams, setTeams] = useState<Team[]>([]);
     const [loading, setLoading] = useState(true);
     const [view, setView] = useState<'list' | 'create' | 'join'>('list');
@@ -51,10 +52,6 @@ export default function TeamManager({ userEmail }: { userEmail: string }) {
     const handleCreateTeam = async () => {
         setError(''); setSuccess('');
         try {
-
-            const user = JSON.parse(localStorage.getItem('encore_user') || '{}');
-            const userId = user.id;
-
             if (!userId) {
                 setError('Session expired. Please log in again.');
                 return;
@@ -82,10 +79,6 @@ export default function TeamManager({ userEmail }: { userEmail: string }) {
     const handleJoinTeam = async () => {
         setError(''); setSuccess('');
         try {
-
-            const user = JSON.parse(localStorage.getItem('encore_user') || '{}');
-            const userId = user.id;
-
             if (!userId) {
                 setError('Session expired. Please log in again.');
                 return;

@@ -1,12 +1,10 @@
 "use client";
 
-import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { motion, useAnimation } from 'framer-motion';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import Image from 'next/image';
-
-
 
 export default function Hero() {
     const [isLoggedIn] = useState(() => {
@@ -15,39 +13,44 @@ export default function Hero() {
         }
         return false;
     });
-    // Dynamic animation delays
-    const [delays] = useState(() => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        if (typeof window !== 'undefined' && (window as any).hasShownIntro) {
-            return { text: 0.3, gate: 0.6 };
-        }
-        return { text: 2, gate: 2.6 };
-    });
+
+    const controls = useAnimation();
+
+    useEffect(() => {
+        const startAnimation = () => {
+            controls.start("visible");
+        };
+
+        window.addEventListener('start-hero-animation', startAnimation);
+
+        // Fallback: If popup logic is disabled or previously shown in session (future proofing)
+        // For now, we rely on the popup trigger.
+
+        return () => window.removeEventListener('start-hero-animation', startAnimation);
+    }, [controls]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const leftGateVariant: any = {
-        hidden: { x: '40%', opacity: 0 }, // Starts from center (shifted right)
+        hidden: { x: '40%', opacity: 0 },
         visible: {
             x: '0%',
             opacity: 1,
             transition: {
-                duration: 1.2, // Slower, more majestic opening
-                ease: "easeOut", // starts fast, slows down
-                delay: delays.gate
+                duration: 1.5,
+                ease: "easeOut"
             }
         }
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const rightGateVariant: any = {
-        hidden: { x: '-40%', opacity: 0 }, // Starts from center (shifted left)
+        hidden: { x: '-40%', opacity: 0 },
         visible: {
             x: '0%',
             opacity: 1,
             transition: {
-                duration: 1.2,
-                ease: "easeOut",
-                delay: delays.gate
+                duration: 1.5,
+                ease: "easeOut"
             }
         }
     };
@@ -62,7 +65,7 @@ export default function Hero() {
             <motion.div
                 variants={leftGateVariant}
                 initial="hidden"
-                animate="visible"
+                animate={controls}
                 className="absolute bottom-0 left-0 w-[45vw] h-[40vh] md:w-[35vw] md:h-[75vh] z-[1] pointer-events-none opacity-90 mix-blend-lighten"
                 style={{
                     maskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to top, black 80%, transparent 100%)',
@@ -86,7 +89,7 @@ export default function Hero() {
             <motion.div
                 variants={rightGateVariant}
                 initial="hidden"
-                animate="visible"
+                animate={controls}
                 className="absolute bottom-0 right-0 w-[45vw] h-[40vh] md:w-[35vw] md:h-[75vh] z-[1] pointer-events-none opacity-90 mix-blend-lighten"
                 style={{
                     maskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), linear-gradient(to top, black 80%, transparent 100%)',

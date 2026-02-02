@@ -766,14 +766,21 @@ export default function AdminPanel() {
                                         message: (
                                             <div className="text-center">
                                                 <p>CA Generated Successfully!</p>
-                                                <div className="my-6 p-4 bg-white/5 border border-gold/30 rounded-xl relative overflow-hidden group">
-                                                    <div className="absolute inset-0 bg-gold/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-                                                    <span className="relative text-gray-400 text-xs uppercase tracking-widest block mb-1">Referral Code</span>
-                                                    <strong className="relative text-gold text-4xl font-cinzel tracking-widest drop-shadow-md">{data.code}</strong>
+                                                <div className="grid grid-cols-2 gap-4 my-6">
+                                                    <div className="p-4 bg-white/5 border border-gold/30 rounded-xl relative overflow-hidden group">
+                                                        <div className="absolute inset-0 bg-gold/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+                                                        <span className="relative text-gray-400 text-xs uppercase tracking-widest block mb-1">Referral Code</span>
+                                                        <strong className="relative text-gold text-2xl font-cinzel tracking-widest drop-shadow-md">{data.code}</strong>
+                                                    </div>
+                                                    <div className="p-4 bg-white/5 border border-red-500/30 rounded-xl relative overflow-hidden group">
+                                                        <div className="absolute inset-0 bg-red-900/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+                                                        <span className="relative text-gray-400 text-xs uppercase tracking-widest block mb-1">Login Password</span>
+                                                        <strong className="relative text-white text-xl font-mono tracking-widest drop-shadow-md">{data.password}</strong>
+                                                    </div>
                                                 </div>
 
                                                 <a
-                                                    href={`https://wa.me/${payload.phone}?text=${encodeURIComponent(`Hello ${payload.name}, Congratulations on being selected as a Campus Ambassador for Encore 26! 🌟\n\nYour Referral Code is: *${data.code}*\n\nShare this code to earn rewards! 🚀`)}`}
+                                                    href={`https://api.whatsapp.com/send?phone=${payload.phone}&text=${encodeURIComponent(`Hello ${payload.name}, Congratulations on being selected as a Campus Ambassador for Encore 26! 🌟\n\nYour Referral Code is: *${data.code}*\nYour Login Password: *${data.password}*\n\nLogin here: https://encore26.com/login\nShare your code to earn rewards! 🚀`)}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="inline-flex items-center gap-2 bg-[#25D366] text-white px-6 py-3 rounded-full font-bold hover:bg-[#128C7E] transition-colors mt-2"

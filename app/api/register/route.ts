@@ -70,6 +70,16 @@ export async function POST(request: Request) {
             // Generate Verification Token
             const emailVerificationToken = crypto.randomBytes(32).toString('hex');
 
+            // Generate Referral Code for User (6-digit)
+            // MERGED FROM MAIN branch logic
+            let newReferralCode = '';
+            let isUniqueCode = false;
+            while (!isUniqueCode) {
+                newReferralCode = Math.floor(100000 + Math.random() * 900000).toString();
+                const existingCode = await tx.user.findUnique({ where: { referralCode: newReferralCode } });
+                if (!existingCode) isUniqueCode = true;
+            }
+
             // Create new user
             const createdUser = await tx.user.create({
                 data: {
@@ -88,11 +98,13 @@ export async function POST(request: Request) {
                     totalPaid: 0,
                     paymentVerified: false,
 
-                    // Verification
+                    // Verification (New Feature)
                     emailVerified: false,
                     emailVerificationToken,
 
-                    referredBy: refId
+                    // Referral (Existing Feature)
+                    referredBy: refId,
+                    referralCode: newReferralCode
                 },
             });
 
@@ -111,7 +123,7 @@ export async function POST(request: Request) {
         }, { status: 201 });
 
     } catch (error) {
-        console.error('Registration Error Details:', error); // Changed log message
+        console.error('Registration Error Details:', error);
         return NextResponse.json({ error: 'Internal Server Error', details: (error as Error).message }, { status: 500 });
     }
 }

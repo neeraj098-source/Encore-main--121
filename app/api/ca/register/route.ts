@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import bcrypt from 'bcryptjs';
 
 export async function POST(request: Request) {
     try {
@@ -23,6 +24,12 @@ export async function POST(request: Request) {
         // Generate Referral Code (Random 5-digit number)
         const code = Math.floor(10000 + Math.random() * 90000).toString();
 
+        // Generate Temporary Password
+        // Pattern: Encore@ + 4 random digits (e.g., Encore@4821)
+        const randomSuffix = Math.floor(1000 + Math.random() * 9000).toString();
+        const tempPassword = `Encore@${randomSuffix}`;
+        const hashedPassword = await bcrypt.hash(tempPassword, 10);
+
         // Generate Unique 6-Digit ID
         let newId = '';
         let isUniqueId = false;
@@ -43,14 +50,16 @@ export async function POST(request: Request) {
                 college,
                 role: 'CA',
                 referralCode: code,
-                caCoins: 0
+                caCoins: 0,
+                password: hashedPassword // Save Hashed Password
             },
         });
 
         return NextResponse.json({
             message: 'CA Registration successful',
             user: newCA,
-            code: code
+            code: code,
+            password: tempPassword // Return Plain Text Password for Admin to see ONCE
         }, { status: 201 });
 
     } catch (error) {

@@ -3,12 +3,17 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import { usePathname } from "next/navigation";
 import CountdownTimer from "./CountdownTimer";
 
 export default function RegistrationPopup() {
     const [isOpen, setIsOpen] = useState(false);
+    const pathname = usePathname();
 
     useEffect(() => {
+        // Don't show on admin pages
+        if (pathname?.startsWith('/admin')) return;
+
         // Show popup shortly after hydration
         const timer = setTimeout(() => {
             // Check if we've already shown it this session if desired
@@ -20,10 +25,14 @@ export default function RegistrationPopup() {
         }, 1000); // 1 second delay for dramatic effect
 
         return () => clearTimeout(timer);
-    }, []);
+    }, [pathname]);
 
     const handleClose = () => {
         setIsOpen(false);
+        // Trigger Hero Gate Animation
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new Event('start-hero-animation'));
+        }
     };
 
     return (

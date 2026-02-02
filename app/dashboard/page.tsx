@@ -159,22 +159,32 @@ export default function Dashboard() {
                         <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
                             <h3 className="text-gold font-cinzel mb-4">Your Quest</h3>
                             <div className="space-y-4">
-                                {/* CA Specific View */}
-                                {user.role === 'CA' && (
-                                    <div className="bg-gold/10 border border-gold/30 rounded-lg p-4 mb-4">
-                                        <h4 className="text-gold font-cinzel text-sm mb-1">Ambassador Status</h4>
-                                        <p className="text-xs text-gray-400 mb-2">Share your code to earn rewards</p>
-                                        <div className="flex justify-between items-center bg-black/40 p-2 rounded border border-gold/20">
-                                            <code className="text-gold font-mono font-bold">{user.referralCode}</code>
-                                            <button
-                                                onClick={() => navigator.clipboard.writeText(user.referralCode || '')}
-                                                className="text-xs text-gray-400 hover:text-white"
-                                            >
-                                                Copy
-                                            </button>
-                                        </div>
+                                {/* Referral Code Section (For All Users) */}
+                                <div className="bg-gold/10 border border-gold/30 rounded-lg p-4 mb-4">
+                                    <h4 className="text-gold font-cinzel text-sm mb-1">Referral Program</h4>
+                                    <p className="text-xs text-gray-400 mb-2">Share your code to earn rewards</p>
+                                    <div className="flex items-center gap-2 bg-black/40 p-2 rounded border border-gold/20">
+                                        <code className="text-gold font-mono font-bold flex-1">{user.referralCode || 'Generate Code'}</code>
+                                        <button
+                                            onClick={() => navigator.clipboard.writeText(user.referralCode || '')}
+                                            className="text-xs text-gray-400 hover:text-white px-2"
+                                            title="Copy Code"
+                                        >
+                                            Copy
+                                        </button>
+                                        <a
+                                            href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                                                `Hey! Register for Encore 26 using my referral code *${user.referralCode}* to get exclusive benefits! 🚀\n\nRegister here: https://encore26.com`
+                                            )}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-xs text-[#25D366] hover:text-[#128C7E] border-l border-white/10 pl-2"
+                                            title="Share on WhatsApp"
+                                        >
+                                            WhatsApp
+                                        </a>
                                     </div>
-                                )}
+                                </div>
 
                                 {/* Cart Quest */}
                                 <div className="p-3 border border-white/10 rounded-lg bg-black/40">

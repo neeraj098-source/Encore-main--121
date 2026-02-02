@@ -19,9 +19,9 @@ export default function SignatureNights() {
             delay: 0.2
         },
         {
-            title: "AJAY HOODA",
-            subtitle: "Live in Concert",
-            image: "/images/guests/ajay_huda.png",
+            title: "MALTI CHAHAR",
+            subtitle: "Celebrity Appearance",
+            image: "/images/guests/malti_chahar.png",
             // customBackground: "radial-gradient(circle at center, #785a28 0%, #3e2808 60%, #000000 100%)", // Rich gold/brown radial
             customBackground: "radial-gradient(circle at 50% 30%, #6d4c41 0%, #3e2723 40%, #000000 100%)", // Warm sexy dark tone
             delay: 0.4

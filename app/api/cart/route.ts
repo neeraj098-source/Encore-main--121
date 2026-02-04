@@ -1,104 +1,129 @@
-
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import prisma from "@/lib/prisma";
-import { eventsData } from "@/lib/data";
+import { NextRequest, NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase/server"
+import { eventsData } from "@/lib/data"
 
 export async function GET() {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user?.email) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const supabase = await createClient()
+
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const user = await prisma.user.findUnique({
-        where: { email: session.user.email },
-        include: {
-            cart: {
-                include: { items: true },
-            },
-        },
-    });
+    // Get user's cart with items
+    const { data: cart } = await supabase
+        .from('carts')
+        .select(`
+            *,
+            cart_items (*)
+        `)
+        .eq('user_id', user.id)
+        .single()
 
-    return NextResponse.json(user?.cart || { items: [] });
+    return NextResponse.json(cart || { items: [] })
 }
 
 export async function POST(req: NextRequest) {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user?.email) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const supabase = await createClient()
+
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const { eventSlug } = await req.json();
-    const event = eventsData.find((e) => e.slug === eventSlug);
+    const { eventSlug } = await req.json()
+    const event = eventsData.find((e) => e.slug === eventSlug)
 
     if (!event) {
-        return NextResponse.json({ error: "Event not found" }, { status: 404 });
+        return NextResponse.json({ error: "Event not found" }, { status: 404 })
     }
 
-    const user = await prisma.user.findUnique({ where: { email: session.user.email } });
-    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
-
-    let cart = await prisma.cart.findUnique({ where: { userId: user.id } });
+    // Get or create cart
+    let { data: cart } = await supabase
+        .from('carts')
+        .select('*')
+        .eq('user_id', user.id)
+        .single()
 
     if (!cart) {
-        cart = await prisma.cart.create({ data: { userId: user.id } });
+        const { data: newCart, error: cartError } = await supabase
+            .from('carts')
+            .insert({ user_id: user.id })
+            .select()
+            .single()
+
+        if (cartError) {
+            return NextResponse.json({ error: "Failed to create cart" }, { status: 500 })
+        }
+        cart = newCart
     }
 
     // Check if item already exists
-    const existingItem = await prisma.cartItem.findUnique({
-        where: {
-            cartId_eventSlug: {
-                cartId: cart.id,
-                eventSlug: eventSlug,
-            },
-        },
-    });
+    const { data: existingItem } = await supabase
+        .from('cart_items')
+        .select('*')
+        .eq('cart_id', cart.id)
+        .eq('event_slug', eventSlug)
+        .single()
 
     if (existingItem) {
-        return NextResponse.json({ message: "Item already in cart" }, { status: 409 });
+        return NextResponse.json({ message: "Item already in cart" }, { status: 409 })
     }
 
     // Add to cart
-    const newItem = await prisma.cartItem.create({
-        data: {
-            cartId: cart.id,
-            eventSlug: event.slug,
-            eventName: event.title,
+    const { data: newItem, error: itemError } = await supabase
+        .from('cart_items')
+        .insert({
+            cart_id: cart.id,
+            event_slug: event.slug,
+            event_name: event.title,
             price: event.price || 0,
-        },
-    });
+        })
+        .select()
+        .single()
 
-    return NextResponse.json(newItem);
+    if (itemError) {
+        return NextResponse.json({ error: "Failed to add item" }, { status: 500 })
+    }
+
+    return NextResponse.json(newItem)
 }
 
 export async function DELETE(req: NextRequest) {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user?.email) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const supabase = await createClient()
+
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const { searchParams } = new URL(req.url);
-    const cartItemId = searchParams.get("id");
+    const { searchParams } = new URL(req.url)
+    const cartItemId = searchParams.get("id")
 
     if (!cartItemId) {
-        return NextResponse.json({ error: "Cart Item ID required" }, { status: 400 });
+        return NextResponse.json({ error: "Cart Item ID required" }, { status: 400 })
     }
 
-    // Verify ownership before deleting
-    const user = await prisma.user.findUnique({
-        where: { email: session.user.email },
-        include: { cart: true }
-    });
+    // Get user's cart
+    const { data: cart } = await supabase
+        .from('carts')
+        .select('id')
+        .eq('user_id', user.id)
+        .single()
 
-    if (!user?.cart) return NextResponse.json({ error: "Cart not found" }, { status: 404 });
+    if (!cart) {
+        return NextResponse.json({ error: "Cart not found" }, { status: 404 })
+    }
 
-    await prisma.cartItem.deleteMany({
-        where: {
-            id: cartItemId,
-            cartId: user.cart.id // Ensure item belongs to user's cart
-        }
-    });
+    // Delete item (only if it belongs to user's cart)
+    await supabase
+        .from('cart_items')
+        .delete()
+        .eq('id', cartItemId)
+        .eq('cart_id', cart.id)
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true })
 }

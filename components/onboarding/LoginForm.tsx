@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import { Mail, Lock } from 'lucide-react';
-import { signIn } from 'next-auth/react';
+import { createClient } from '@/lib/supabase/client';
 
 export default function LoginForm() {
     const router = useRouter();
@@ -43,8 +43,6 @@ export default function LoginForm() {
         accommodation: ''
     });
 
-
-
     // Login Data
     const [loginData, setLoginData] = useState({
         email: '',
@@ -59,8 +57,6 @@ export default function LoginForm() {
         setLoginData(prev => ({ ...prev, [field]: value }));
     };
 
-
-
     // --- Login Logic ---
     const handleLogin = async () => {
         if (!loginData.email || !loginData.password) {
@@ -73,32 +69,54 @@ export default function LoginForm() {
             return;
         }
 
+        // Email format validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(loginData.email)) {
+            setModalState({
+                isOpen: true,
+                title: "Invalid Email",
+                message: "Please enter a valid email address.",
+                type: "warning"
+            });
+            return;
+        }
+
         setIsLoading(true);
         try {
-            const res = await signIn('credentials', {
-                redirect: false,
+            const supabase = createClient();
+            const { data, error } = await supabase.auth.signInWithPassword({
                 email: loginData.email.trim().toLowerCase(),
                 password: loginData.password.trim(),
             });
 
-            if (res?.error) {
+            if (error) {
+                let errorMessage = error.message;
+
+                if (error.message.includes('Invalid login credentials')) {
+                    errorMessage = 'Invalid email or password.';
+                } else if (error.message.includes('Email not confirmed')) {
+                    errorMessage = 'Please verify your email first. Check your inbox for the verification link.';
+                }
+
                 setModalState({
                     isOpen: true,
                     title: "Login Failed",
-                    message: "Invalid email or password.",
+                    message: errorMessage,
                     type: "error"
                 });
-            } else {
+            } else if (data.user) {
+                setLoginData({ email: '', password: '' }); // Clear form
                 localStorage.setItem('encore_user', JSON.stringify({ email: loginData.email }));
                 // Notify Navbar immediately
                 window.dispatchEvent(new Event('user-login'));
                 router.push('/dashboard');
             }
-        } catch {
+        } catch (error) {
+            console.error('Login error:', error);
             setModalState({
                 isOpen: true,
-                title: "Error",
-                message: "Something went wrong. Please try again.",
+                title: "Network Error",
+                message: "Connection error. Please check your internet and try again.",
                 type: "error"
             });
         } finally {
@@ -144,6 +162,29 @@ export default function LoginForm() {
     };
 
     const handleSubmit = async () => {
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+            setModalState({
+                isOpen: true,
+                title: "Invalid Email",
+                message: "Please enter a valid email address.",
+                type: "warning"
+            });
+            return;
+        }
+
+        // Password strength check
+        if (formData.password.length < 6) {
+            setModalState({
+                isOpen: true,
+                title: "Weak Password",
+                message: "Password must be at least 6 characters long.",
+                type: "warning"
+            });
+            return;
+        }
+
         setIsLoading(true);
         try {
             const res = await fetch('/api/register', {
@@ -153,48 +194,54 @@ export default function LoginForm() {
                     ...formData,
                     email: formData.email.trim().toLowerCase(),
                     password: formData.password.trim(),
+                    accommodation: formData.accommodation === 'yes' ? 'YES' : 'NO',
                     confirmPassword: formData.confirmPassword.trim(),
-                    // paymentId: paymentState.paymentId.trim(),
-                    // paymentScreenshot: paymentState.preview,
-                    totalPaid: 0 // Payment deferred
+                    totalPaid: 0
                 }),
             });
 
             const data = await res.json();
 
             if (res.ok) {
-                if (data.exists) {
-                    setModalState({
-                        isOpen: true,
-                        title: "User Exists",
-                        message: "User already exists! Please login.",
-                        type: "info",
-                        onAction: () => {
-                            setIsLoginMode(true);
-                            setModalState(prev => ({ ...prev, isOpen: false }));
-                        },
-                        actionLabel: "Login Now"
-                    });
-                } else {
-                    setModalState({
-                        isOpen: true,
-                        title: "Check Your Email",
-                        message: "Registration Successful! Please check your email to verify your account before logging in.",
-                        type: "success",
-                        onAction: () => {
-                            setIsLoginMode(true);
-                            setModalState(prev => ({ ...prev, isOpen: false }));
-                        }, // Switch to login after registration
-                        actionLabel: "Login Now"
-                    });
-                    localStorage.setItem('encore_user', JSON.stringify(data.user));
-                    window.dispatchEvent(new Event('user-login'));
-                }
+                setModalState({
+                    isOpen: true,
+                    title: "Registration Successful!",
+                    message: "Please check your email to verify your account before logging in.",
+                    type: "success",
+                    onAction: () => {
+                        // Reset form and switch to login
+                        setFormData({
+                            name: '',
+                            email: '',
+                            gender: '',
+                            phone: '',
+                            password: '',
+                            confirmPassword: '',
+                            referralCode: '',
+                            college: '',
+                            year: '',
+                            course: '',
+                            accommodation: ''
+                        });
+                        setStep(1);
+                        setIsLoginMode(true);
+                        setModalState(prev => ({ ...prev, isOpen: false }));
+                    },
+                    actionLabel: "Go to Login"
+                });
             } else {
+                let errorMessage = data.error || 'Registration failed. Please try again.';
+
+                if (data.error && data.error.includes('already exists')) {
+                    errorMessage = 'This email is already registered. Please login instead.';
+                } else if (data.details) {
+                    errorMessage = data.details;
+                }
+
                 setModalState({
                     isOpen: true,
                     title: "Registration Failed",
-                    message: data.error || 'Registration failed.',
+                    message: errorMessage,
                     type: "error"
                 });
             }
@@ -203,7 +250,7 @@ export default function LoginForm() {
             setModalState({
                 isOpen: true,
                 title: "Network Error",
-                message: "Connection error. Please check your internet.",
+                message: "Connection error. Please check your internet and try again.",
                 type: "error"
             });
         } finally {
@@ -317,7 +364,7 @@ export default function LoginForm() {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -20 }}
                     >
-                        {/* Stepper Header (Only show in Register mode) */}
+                        {/* Stepper Header */}
                         <div className="relative z-10 flex justify-center items-center mb-10 gap-4">
                             <div className="flex flex-col items-center">
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm mb-2 transition-all ${step >= 1 ? 'bg-gold text-black' : 'bg-white/10 text-gray-400'}`}>
@@ -332,14 +379,10 @@ export default function LoginForm() {
                                 </div>
                                 <span className={`text-[10px] uppercase tracking-widest ${step >= 2 ? 'text-gold' : 'text-gray-500'}`}>College</span>
                             </div>
-
                         </div>
 
                         {step === 1 && (
                             <form onSubmit={(e) => { e.preventDefault(); handleNext(); }} className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
-                                {/* Dev Autofill Button (Top Right of Form) */}
-
-
                                 <div className="md:col-span-2 space-y-2">
                                     <label className="text-xs text-gray-400 ml-1">Name*</label>
                                     <input
@@ -443,7 +486,6 @@ export default function LoginForm() {
                                 <div className="space-y-2">
                                     <label className="text-xs text-gray-400 ml-1">Accommodation*</label>
                                     <div className="grid grid-cols-2 gap-4">
-
                                         <button type="button" onClick={() => handleChange('accommodation', 'yes')} className={`p-4 rounded-lg border transition-all ${formData.accommodation === 'yes' ? 'bg-gold/20 border-gold text-white' : 'border-white/10 text-gray-400 hover:border-white/30'}`}>
                                             <div className="flex flex-col items-center">
                                                 <span className="font-marcellus text-lg mb-1">Yes</span>

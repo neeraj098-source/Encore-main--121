@@ -4,39 +4,47 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
-import { signIn } from 'next-auth/react';
+import { createClient } from '@/lib/supabase/client';
 import { Lock, Mail } from 'lucide-react';
 
 export default function CAPortal() {
     const router = useRouter();
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
+        setError('');
 
         try {
-            const res = await signIn('credentials', {
-                redirect: false,
-                email: formData.email,
+            const supabase = createClient();
+            const { data, error: authError } = await supabase.auth.signInWithPassword({
+                email: formData.email.toLowerCase().trim(),
                 password: formData.password,
             });
 
-            if (res?.error) {
-                alert('Invalid Credentials');
-            } else {
-                // Check role (optional, but good for UX if we could. 
-                // Since signIn is opaque, we rely on dashboard to redirect if not CA, 
-                // or we can fetch user details after login)
+            if (authError) {
+                setError('Invalid Credentials');
+            } else if (data.user) {
+                // Check if user is a CA
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', data.user.id)
+                    .single();
 
-                // For now, assume success and redirect. 
-                // The dashboard should handle role-based content.
-                router.push('/dashboard');
+                if (profile?.role !== 'CA' && profile?.role !== 'ADMIN') {
+                    setError('Access denied. CA accounts only.');
+                    await supabase.auth.signOut();
+                } else {
+                    router.push('/dashboard');
+                }
             }
-        } catch (error) {
-            console.error(error);
-            alert('Login failed');
+        } catch (err) {
+            console.error(err);
+            setError('Login failed');
         } finally {
             setLoading(false);
         }
@@ -58,6 +66,12 @@ export default function CAPortal() {
                     <h1 className="text-3xl font-cinzel text-gold mb-2">CA Login</h1>
                     <p className="text-gray-400 font-marcellus text-sm">Access your Ambassador Dashboard</p>
                 </div>
+
+                {error && (
+                    <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-sm text-center">
+                        {error}
+                    </div>
+                )}
 
                 <form onSubmit={handleLogin} className="space-y-6">
                     <div className="space-y-2">

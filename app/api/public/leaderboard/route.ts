@@ -1,50 +1,50 @@
+import { NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-
-export const dynamic = 'force-dynamic'; // Ensure real-time data
+export const dynamic = 'force-dynamic' // Ensure real-time data
 
 export async function GET() {
     try {
-        // 1. Fetch all CAs
-        const cas = await prisma.user.findMany({
-            where: {
-                role: 'CA',
-                referralCode: { not: null }
-            },
-            select: {
-                name: true,
-                college: true,
-                referralCode: true,
-            }
-        });
+        const supabase = await createClient()
 
-        // 2. Aggregate Referral Counts
+        // Fetch all CAs with their referral codes
+        const { data: cas, error: casError } = await supabase
+            .from('profiles')
+            .select('id, name, college, referral_code')
+            .eq('role', 'CA')
+            .not('referral_code', 'is', null)
+
+        if (casError) {
+            console.error("CA fetch error:", casError)
+            return NextResponse.json({ error: "Failed to fetch CAs" }, { status: 500 })
+        }
+
+        // Build leaderboard with referral counts
         const leaderboard = await Promise.all(
-            cas.map(async (ca) => {
-                const count = await prisma.user.count({
-                    where: {
-                        referredBy: ca.referralCode as string
-                    }
-                });
+            (cas || []).map(async (ca) => {
+                const { count } = await supabase
+                    .from('profiles')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('referred_by', ca.referral_code)
+
                 return {
                     name: ca.name,
                     college: ca.college,
-                    referralCode: ca.referralCode,
-                    referrals: count
-                };
+                    referralCode: ca.referral_code,
+                    referrals: count || 0
+                }
             })
-        );
+        )
 
-        // 3. Sort by Referrals (Descending)
-        leaderboard.sort((a, b) => b.referrals - a.referrals);
+        // Sort by Referrals (Descending)
+        leaderboard.sort((a, b) => b.referrals - a.referrals)
 
-        return NextResponse.json(leaderboard);
+        return NextResponse.json(leaderboard)
     } catch (error) {
-        console.error("Public Leaderboard Error:", error);
+        console.error("Public Leaderboard Error:", error)
         return NextResponse.json(
             { error: "Failed to fetch leaderboard" },
             { status: 500 }
-        );
+        )
     }
 }

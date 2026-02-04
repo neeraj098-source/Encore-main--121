@@ -1,76 +1,95 @@
-
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase/server"
 
 export async function POST(req: NextRequest) {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user?.email) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const supabase = await createClient()
+
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Get User and Cart
-    const user = await prisma.user.findUnique({
-        where: { email: session.user.email },
-        include: {
-            cart: {
-                include: { items: true },
-            },
-        },
-    });
+    // Get user profile and cart
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('total_paid')
+        .eq('id', user.id)
+        .single()
 
-    if (!user || !user.cart || user.cart.items.length === 0) {
-        return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
+    const { data: cart } = await supabase
+        .from('carts')
+        .select(`
+            *,
+            cart_items (*)
+        `)
+        .eq('user_id', user.id)
+        .single()
+
+    if (!cart || !cart.cart_items || cart.cart_items.length === 0) {
+        return NextResponse.json({ error: "Cart is empty" }, { status: 400 })
     }
 
-    const { passType, paymentId, paymentScreenshot } = await req.json().catch(() => ({ passType: null }));
+    const { passType, paymentId, paymentScreenshot } = await req.json().catch(() => ({ passType: null }))
 
-    const cartItems = user.cart.items;
-    let totalAmount = cartItems.reduce((sum, item) => sum + item.price, 0);
+    const cartItems = cart.cart_items
+    let totalAmount = cartItems.reduce((sum: number, item: { price: number }) => sum + item.price, 0)
 
     // Add Pass Price (Only if not already paid)
-    let passPrice = 0;
-    let securityDeposit = 0;
-    if (user.totalPaid === 0) {
-        if (passType === 'basic') passPrice = 399;
-        if (passType === 'accommodation') passPrice = 999;
+    let passPrice = 0
+    let securityDeposit = 0
+    if (!profile?.total_paid || profile.total_paid === 0) {
+        if (passType === 'basic') passPrice = 399
+        if (passType === 'accommodation') passPrice = 999
 
         if (passPrice > 0) {
-            securityDeposit = 200;
+            securityDeposit = 200
         }
     }
-    totalAmount += passPrice + securityDeposit;
+    totalAmount += passPrice + securityDeposit
 
     // Validate Payment Proof for Paid Orders
     if (totalAmount > 0 && (!paymentId || !paymentScreenshot)) {
-        return NextResponse.json({ error: "Payment proof missing" }, { status: 400 });
+        return NextResponse.json({ error: "Payment proof missing" }, { status: 400 })
     }
 
     // Create Order
-    const order = await prisma.order.create({
-        data: {
-            userId: user.id,
-            totalAmount: totalAmount,
-            status: "PENDING",
-            passType: passType,
-            paymentId: paymentId,
-            paymentScreenshot: paymentScreenshot,
-            securityDeposit: securityDeposit,
-            items: {
-                create: cartItems.map((item) => ({
-                    eventSlug: item.eventSlug,
-                    eventName: item.eventName,
-                    price: item.price,
-                })),
-            },
-        },
-    });
+    const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+            user_id: user.id,
+            total_amount: totalAmount,
+            status: 'PENDING',
+            pass_type: passType,
+            payment_id: paymentId,
+            payment_screenshot: paymentScreenshot,
+            security_deposit: securityDeposit,
+        })
+        .select()
+        .single()
+
+    if (orderError) {
+        console.error('Order creation error:', orderError)
+        return NextResponse.json({ error: "Failed to create order" }, { status: 500 })
+    }
+
+    // Create Order Items
+    const orderItems = cartItems.map((item: { event_slug: string; event_name: string; price: number }) => ({
+        order_id: order.id,
+        event_slug: item.event_slug,
+        event_name: item.event_name,
+        price: item.price,
+    }))
+
+    await supabase
+        .from('order_items')
+        .insert(orderItems)
 
     // Clear Cart
-    await prisma.cartItem.deleteMany({
-        where: { cartId: user.cart.id },
-    });
+    await supabase
+        .from('cart_items')
+        .delete()
+        .eq('cart_id', cart.id)
 
-    return NextResponse.json({ success: true, orderId: order.id });
+    return NextResponse.json({ success: true, orderId: order.id })
 }

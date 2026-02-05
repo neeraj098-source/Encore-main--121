@@ -1,155 +1,154 @@
-import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import bcrypt from 'bcryptjs';
+import { sendVerificationEmail } from "@/lib/email";
+import crypto from "crypto";
 
 export async function POST(request: Request) {
     try {
-        const body = await request.json()
-        let { name, email, phone, college, year, accommodation, password, gender, referralCode } = body
+        const body = await request.json();
+        let { name, email, phone, college, year, accommodation, password, gender, referralCode } = body;
 
         // Normalize email
-        email = email ? email.toLowerCase().trim() : email
+        email = email ? email.toLowerCase() : email;
 
         // Basic validation
         if (!name || !email) {
-            return NextResponse.json({ error: 'Name and Email are required' }, { status: 400 })
+            return NextResponse.json({ error: 'Name and Email are required' }, { status: 400 });
         }
 
         // Validate email format
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            return NextResponse.json({ error: 'Invalid email format' }, { status: 400 })
+            return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
         }
 
         // Validate password
         if (!password || password.length < 6) {
-            return NextResponse.json({ error: 'Password must be at least 6 characters long' }, { status: 400 })
+            return NextResponse.json({ error: 'Password must be at least 6 characters long' }, { status: 400 });
         }
 
-        const supabase = await createClient()
+        const { newUser, referrerId } = await prisma.$transaction(async (tx) => {
+            // Check if user exists (inside tx lock)
+            const existingUser = await tx.user.findUnique({
+                where: { email },
+            });
 
-        // Sign up with Supabase Auth
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
+            if (existingUser) {
+                // Throwing error to abort transaction
+                throw new Error('User already exists');
+            }
+
+            // Handle Referral
+            let refId = null;
+            if (referralCode) {
+                const referrer = await tx.user.findUnique({
+                    where: { referralCode: referralCode }
+                });
+
+                if (referrer) {
+                    await tx.user.update({
+                        where: { id: referrer.id },
+                        data: {
+                            caCoins: { increment: 50 },
+                            coinHistory: {
+                                create: {
+                                    amount: 50,
+                                    reason: `Referral Bonus: User Registration`
+                                }
+                            }
+                        }
+                    });
+                    refId = referralCode;
+                }
+            }
+
+            // Hash Password
+            let hashedPassword = null;
+            if (password) {
+                hashedPassword = await bcrypt.hash(password.trim(), 10);
+            }
+
+            // Generate Unique 6-Digit ID
+            let newId = '';
+            let isUniqueId = false;
+            while (!isUniqueId) {
+                newId = Math.floor(100000 + Math.random() * 900000).toString();
+                const existingId = await tx.user.findUnique({ where: { id: newId } });
+                if (!existingId) isUniqueId = true;
+            }
+
+            // Generate Verification Token
+            const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+
+            // Generate Referral Code for User (6-digit)
+            // MERGED FROM MAIN branch logic
+            let newReferralCode = '';
+            let isUniqueCode = false;
+            while (!isUniqueCode) {
+                newReferralCode = Math.floor(100000 + Math.random() * 900000).toString();
+                const existingCode = await tx.user.findUnique({ where: { referralCode: newReferralCode } });
+                if (!existingCode) isUniqueCode = true;
+            }
+
+            // Create new user
+            const createdUser = await tx.user.create({
                 data: {
+                    id: newId,
                     name,
+                    email,
+                    password: hashedPassword,
                     gender,
                     phone,
                     college,
                     year,
                     accommodation,
-                    referralCode
-                }
-            }
-        })
+                    // Payment fields defaults
+                    paymentId: null,
+                    paymentScreenshot: null,
+                    totalPaid: 0,
+                    paymentVerified: false,
 
-        if (authError) {
-            console.error('Supabase Auth Error:', authError)
+                    // Verification (New Feature)
+                    emailVerified: false,
+                    emailVerificationToken,
 
-            if (authError.message.includes('already registered')) {
-                return NextResponse.json({
-                    error: 'This email is already registered. Please login instead.',
-                }, { status: 409 })
-            }
+                    // Referral (Existing Feature)
+                    referredBy: refId,
+                    referralCode: newReferralCode
+                },
+            });
 
-            return NextResponse.json({
-                error: 'Registration failed',
-                details: authError.message
-            }, { status: 500 })
-        }
+            return { newUser: createdUser, referrerId: refId };
+        });
 
-        if (!authData.user) {
-            return NextResponse.json({
-                error: 'Registration failed - no user created'
-            }, { status: 500 })
-        }
-
-        // Generate unique referral code
-        const generateReferralCode = () => Math.floor(100000 + Math.random() * 900000).toString()
-        let newReferralCode = generateReferralCode()
-
-        // Ensure referral code is unique
-        let { data: existingCode } = await supabase
-            .from('profiles')
-            .select('referral_code')
-            .eq('referral_code', newReferralCode)
-            .single()
-
-        while (existingCode) {
-            newReferralCode = generateReferralCode()
-            const result = await supabase
-                .from('profiles')
-                .select('referral_code')
-                .eq('referral_code', newReferralCode)
-                .single()
-            existingCode = result.data
-        }
-
-        // Update the profile with additional data
-        const { error: profileError } = await supabase
-            .from('profiles')
-            .update({
-                name,
-                gender,
-                phone,
-                college,
-                year,
-                accommodation,
-                referral_code: newReferralCode,
-                referred_by: referralCode || null
-            })
-            .eq('id', authData.user.id)
-
-        if (profileError) {
-            console.error('Profile Update Error:', profileError)
-            // Profile was created by trigger, this is just additional data
-        }
-
-        // Handle referral bonus if valid referral code provided
-        if (referralCode) {
-            const { data: referrer } = await supabase
-                .from('profiles')
-                .select('id, ca_coins')
-                .eq('referral_code', referralCode)
-                .single()
-
-            if (referrer) {
-                // Add 50 coins to referrer
-                await supabase
-                    .from('profiles')
-                    .update({ ca_coins: referrer.ca_coins + 50 })
-                    .eq('id', referrer.id)
-
-                // Add to coin history
-                await supabase
-                    .from('coin_history')
-                    .insert({
-                        user_id: referrer.id,
-                        amount: 50,
-                        reason: 'Referral Bonus: User Registration'
-                    })
-            }
+        // Send Verification Email
+        if (newUser.emailVerificationToken) {
+            await sendVerificationEmail(newUser.email, newUser.emailVerificationToken);
         }
 
         return NextResponse.json({
             message: 'Registration successful. Please check your email to verify your account.',
-            user: {
-                id: authData.user.id,
-                email: authData.user.email,
-                name
-            },
+            user: newUser,
             exists: false
-        }, { status: 201 })
+        }, { status: 201 });
 
     } catch (error) {
-        console.error('Registration Error Details:', error)
+        console.error('Registration Error Details:', error);
+        
+        // Better error handling
+        const errorMessage = (error as Error).message;
+        
+        if (errorMessage.includes('already exists')) {
+            return NextResponse.json({ 
+                error: 'This email is already registered. Please login instead.',
+                details: errorMessage 
+            }, { status: 409 });
+        }
 
-        const errorMessage = (error as Error).message
-
-        return NextResponse.json({
+        return NextResponse.json({ 
             error: 'Registration failed',
-            details: errorMessage
-        }, { status: 500 })
+            details: errorMessage 
+        }, { status: 500 });
     }
 }

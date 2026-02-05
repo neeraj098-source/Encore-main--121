@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import { Mail, Lock } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
+import { signIn } from 'next-auth/react';
 
 export default function LoginForm() {
     const router = useRouter();
@@ -43,6 +43,8 @@ export default function LoginForm() {
         accommodation: ''
     });
 
+
+
     // Login Data
     const [loginData, setLoginData] = useState({
         email: '',
@@ -56,6 +58,8 @@ export default function LoginForm() {
     const handleLoginChange = (field: string, value: string) => {
         setLoginData(prev => ({ ...prev, [field]: value }));
     };
+
+
 
     // --- Login Logic ---
     const handleLogin = async () => {
@@ -83,28 +87,33 @@ export default function LoginForm() {
 
         setIsLoading(true);
         try {
-            const supabase = createClient();
-            const { data, error } = await supabase.auth.signInWithPassword({
+            const res = await signIn('credentials', {
+                redirect: false,
                 email: loginData.email.trim().toLowerCase(),
                 password: loginData.password.trim(),
             });
 
-            if (error) {
-                let errorMessage = error.message;
-
-                if (error.message.includes('Invalid login credentials')) {
+            if (res?.error) {
+                // Map common NextAuth errors to user-friendly messages
+                let errorMessage = res.error;
+                
+                if (res.error === 'Invalid credentials') {
                     errorMessage = 'Invalid email or password.';
-                } else if (error.message.includes('Email not confirmed')) {
+                } else if (res.error === 'User not found') {
+                    errorMessage = 'No account found with this email. Please register first.';
+                } else if (res.error === 'Password not set') {
+                    errorMessage = 'Password not configured. Contact support.';
+                } else if (res.error === 'Email not verified. Please check your inbox.') {
                     errorMessage = 'Please verify your email first. Check your inbox for the verification link.';
                 }
-
+                
                 setModalState({
                     isOpen: true,
                     title: "Login Failed",
                     message: errorMessage,
                     type: "error"
                 });
-            } else if (data.user) {
+            } else if (res?.ok) {
                 setLoginData({ email: '', password: '' }); // Clear form
                 localStorage.setItem('encore_user', JSON.stringify({ email: loginData.email }));
                 // Notify Navbar immediately
@@ -194,7 +203,7 @@ export default function LoginForm() {
                     ...formData,
                     email: formData.email.trim().toLowerCase(),
                     password: formData.password.trim(),
-                    accommodation: formData.accommodation === 'yes' ? 'YES' : 'NO',
+                    accommodation: formData.accommodation === 'yes' ? 'YES' : 'NO', // Convert to uppercase
                     confirmPassword: formData.confirmPassword.trim(),
                     totalPaid: 0
                 }),
@@ -230,14 +239,15 @@ export default function LoginForm() {
                     actionLabel: "Go to Login"
                 });
             } else {
+                // Handle different error scenarios
                 let errorMessage = data.error || 'Registration failed. Please try again.';
-
+                
                 if (data.error && data.error.includes('already exists')) {
                     errorMessage = 'This email is already registered. Please login instead.';
                 } else if (data.details) {
                     errorMessage = data.details;
                 }
-
+                
                 setModalState({
                     isOpen: true,
                     title: "Registration Failed",
@@ -364,7 +374,7 @@ export default function LoginForm() {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -20 }}
                     >
-                        {/* Stepper Header */}
+                        {/* Stepper Header (Only show in Register mode) */}
                         <div className="relative z-10 flex justify-center items-center mb-10 gap-4">
                             <div className="flex flex-col items-center">
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm mb-2 transition-all ${step >= 1 ? 'bg-gold text-black' : 'bg-white/10 text-gray-400'}`}>
@@ -379,10 +389,14 @@ export default function LoginForm() {
                                 </div>
                                 <span className={`text-[10px] uppercase tracking-widest ${step >= 2 ? 'text-gold' : 'text-gray-500'}`}>College</span>
                             </div>
+
                         </div>
 
                         {step === 1 && (
                             <form onSubmit={(e) => { e.preventDefault(); handleNext(); }} className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
+                                {/* Dev Autofill Button (Top Right of Form) */}
+
+
                                 <div className="md:col-span-2 space-y-2">
                                     <label className="text-xs text-gray-400 ml-1">Name*</label>
                                     <input
@@ -486,6 +500,7 @@ export default function LoginForm() {
                                 <div className="space-y-2">
                                     <label className="text-xs text-gray-400 ml-1">Accommodation*</label>
                                     <div className="grid grid-cols-2 gap-4">
+
                                         <button type="button" onClick={() => handleChange('accommodation', 'yes')} className={`p-4 rounded-lg border transition-all ${formData.accommodation === 'yes' ? 'bg-gold/20 border-gold text-white' : 'border-white/10 text-gray-400 hover:border-white/30'}`}>
                                             <div className="flex flex-col items-center">
                                                 <span className="font-marcellus text-lg mb-1">Yes</span>

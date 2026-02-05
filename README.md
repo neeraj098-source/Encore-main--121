@@ -548,3 +548,4 @@ Developed for Encore 26 - IET Lucknow's Annual Cultural Fest
 ---
 
 **Encore 26 | Nawabi Elegance** - Where Culture Meets Technology
+# main-encore-ietlucknow
